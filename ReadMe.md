@@ -19,41 +19,52 @@ distribution-system/
 ├── backend/          # Django project
 ├── frontend/         # Next.js project
 └── README.md
+
 Setup on a New Device (Laptop or Desktop)
 1. Clone the repository
-Bashgit clone https://github.com/YourUsername/distribution-system.git
+git clone https://github.com/jxn-24/distribution-system.git
 cd distribution-system
+
 2. Backend Setup
-Bashcd backend
+cd backend
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
 Create the .env file:
-Bashnano .env
+nano .env
 Paste this (update the password):
+
 envDEBUG=True
 SECRET_KEY=your-secret-key-here
-DATABASE_URL=postgres://distribution_user:YourStrongPasswordHere@localhost:5432/distribution_db
+DATABASE_URL=postgres://distribution_user:flow2026@localhost:5432/distribution_db
 REDIS_URL=redis://localhost:6379/0
 ALLOWED_HOSTS=localhost,127.0.0.1
 CORS_ALLOWED_ORIGINS=http://localhost:3000
+
 3. PostgreSQL Database
 Make sure PostgreSQL is installed and running, then create the database and user (only needed once per machine):
 SQLCREATE DATABASE distribution_db;
 CREATE USER distribution_user WITH PASSWORD 'YourStrongPasswordHere';
 GRANT ALL PRIVILEGES ON DATABASE distribution_db TO distribution_user;
+
+
 4. Frontend Setup
-Bashcd ../frontend
+cd ../frontend
 npm install
+
 Create the environment file:
-Bashnano .env.local
+nano .env.local
 envNEXT_PUBLIC_API_URL=http://localhost:8000/api
+
 5. Run the Project
+
 Terminal 1 – Backend:
 Bashcd backend
 source venv/bin/activate
 python manage.py migrate
 python manage.py runserver
+
 Terminal 2 – Frontend:
 Bashcd frontend
 npm run dev

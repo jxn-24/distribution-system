@@ -1,5 +1,5 @@
 from pathlib import Path
-from dateline import timedelta
+from datetime import timedelta
 import os
 from dotenv import load_dotenv
 
@@ -99,7 +99,7 @@ USE_TZ = True
 STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# Custom User Model (we will create it next)
+
 AUTH_USER_MODEL = "users.User"
 
 # CORS

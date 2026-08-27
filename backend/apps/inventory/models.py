@@ -117,5 +117,152 @@ class Batch(models.Model):
             delta = self.expiry_date - timezone.now().date()
             return delta.days
         return None
+       
+class Warehouse(models.Model):
+    name = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=20, unique=True, help_text="Short code e.g. WH-NBO")
+    address = models.TextField(blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
-        
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return f"{self.code} - {self.name}"
+
+class StockLocation(models.Model):
+    """Bins / Shelves inside a warehouse"""
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name="locations"
+    )
+    name = models.CharField(max_length=50, help_text="e.g. A-01-01 or Receiving Bay")
+    description = models.CharField(max_length=200, blank=True, null=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        unique_together = ["warehouse", "name"]
+        ordering = ["warehouse", "name"]
+
+    def __str__(self):
+        return f"{self.warehouse.code} | {self.name}"
+
+class Inventory(models.Model):
+    """
+    Current stock balance of a product (and optionally a batch) in a location.
+    """
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="inventory_records"
+    )
+    batch = models.ForeignKey(
+        Batch,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="inventory_records"
+    )
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name="inventory_records"
+    )
+    location = models.ForeignKey(
+        StockLocation,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="inventory_records"
+    )
+
+    quantity_on_hand = models.PositiveIntegerField(default=0)
+    quantity_reserved = models.PositiveIntegerField(default=0)
+    
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "Inventory"
+        unique_together = ["product", "batch", "warehouse", "location"]
+        ordering = ["product__name"]
+
+    def __str__(self):
+        batch_info = f" | {self.batch.batch_number}" if self.batch else ""
+        return f"{self.product.sku}{batch_info} @ {self.warehouse.code} = {self.quantity_on_hand}"
+
+    @property
+    def quantity_available(self):
+        """Stock that can still be sold/reserved"""
+        return self.quantity_on_hand - self.quantity_reserved
+
+class StockMovement(models.Model):
+    """
+    Complete ledger of every stock change.
+    This is the source of truth for inventory history.
+    """
+    MOVEMENT_TYPES = [
+        ("RECEIVE", "Receive from Supplier"),
+        ("TRANSFER_IN", "Transfer In"),
+        ("TRANSFER_OUT", "Transfer Out"),
+        ("RESERVE", "Reserve for Order"),
+        ("RELEASE", "Release Reservation"),
+        ("PICK", "Pick for Order"),
+        ("SHIP", "Ship to Customer"),
+        ("ADJUST_IN", "Adjustment Increase"),
+        ("ADJUST_OUT", "Adjustment Decrease"),
+        ("RETURN", "Customer Return"),
+    ]
+
+    product = models.ForeignKey(
+        Product,
+        on_delete=models.CASCADE,
+        related_name="movements"
+    )
+    batch = models.ForeignKey(
+        Batch,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="movements"
+    )
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name="movements"
+    )
+    location = models.ForeignKey(
+        StockLocation,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="movements"
+    )
+
+    movement_type = models.CharField(max_length=20, choices=MOVEMENT_TYPES)
+    quantity = models.PositiveIntegerField()
+    
+    reference = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="PO number, Sales Order number, etc."
+    )
+    notes = models.TextField(blank=True, null=True)
+
+    created_by = models.ForeignKey(
+        "users.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="stock_movements"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.movement_type} | {self.product.sku} | Qty: {self.quantity}"

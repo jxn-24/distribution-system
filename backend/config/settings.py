@@ -32,9 +32,9 @@ INSTALLED_APPS = [
     "apps.users",
     "apps.core",
     "apps.inventory",
-    "apps.purchasing",
-    "apps.sales",
-    "apps.warehouse",
+    "apps.purchasing.apps.PurchasingConfig",
+    "apps.sales.apps.SalesConfig",
+    "apps.warehouse.apps.WarehouseConfig",
     "apps.finance",
     "apps.common",
 ]

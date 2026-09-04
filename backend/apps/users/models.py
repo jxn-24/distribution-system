@@ -30,3 +30,23 @@ class User(AbstractUser):
     @property
     def is_director(self) -> bool:
         return self.has_role("Director")
+
+    @property
+    def is_warehouse(self) -> bool:
+        return self.has_role("Warehouse")
+
+    @property
+    def is_sales(self) -> bool:
+        return self.has_role("Sales")
+
+    @property
+    def is_finance(self) -> bool:
+        return self.has_role("Finance") 
+
+    @property
+    def is_sales_agent(self) -> bool:
+        return self.has_role("Sales Agent")
+
+    @property
+    def is_customer(self) -> bool:
+        return self.has_role("Customer")    

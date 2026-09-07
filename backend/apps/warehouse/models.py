@@ -74,3 +74,21 @@ class ShipmentItem(models.Model):
 
     def __str__(self):
         return f"{self.shipment.shipment_number} - {self.product.sku}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            #reduce reserved stock when a new shipment item is created
+            from apps.inventory.services import ship_stock
+            shipment = self.shipment
+            ship_stock(
+                product=self.product,
+                warehouse=shipment.warehouse,
+                quantity=self.quantity,
+                batch=self.batch,
+                reference=shipment.shipment_number,
+                notes=f"Auto from Shipment {shipment.shipment_number}",
+                user=shipment.created_by,
+            )

@@ -1,6 +1,6 @@
 from django.db import transaction
 from django.core.exceptions import ValidationError
-from .models import Inventory, StockMovement, Product, Batch, Warehouse, StockLocation
+from .models import Inventory, StockMovement
 
 def _get_or_create_inventory(product, batch, warehouse, location=None):
     inv, _ = Inventory.objects.get_or_create(
@@ -63,16 +63,43 @@ def reserve_stock(
     if quantity <= 0:
         raise ValidationError("Reserve quantity must be positive.")
 
-    inv = _get_or_create_inventory(product, batch, warehouse, location)
+    # Sum available across locations for this product/batch/warehouse
+    invs = Inventory.objects.filter(
+        product=product,
+        warehouse=warehouse,
+        batch=batch,
+    )
+    if not invs.exists():
+        # Create a default row so we can show a clear error
+        inv = _get_or_create_inventory(product, batch, warehouse, location)
+        available = 0
+    else:
+        available = sum(i.quantity_on_hand - i.quantity_reserved for i in invs)
 
-    available = inv.quantity_on_hand - inv.quantity_reserved
     if quantity > available:
         raise ValidationError(
-            f"Not enough stock to reserve. Available: {available}, requested: {quantity}"
+            f"Not enough stock to reserve for {product.sku}. "
+            f"Available: {available}, requested: {quantity}"
         )
 
-    inv.quantity_reserved += quantity
-    inv.save(update_fields=["quantity_reserved", "updated_at"])
+    # Reserve from the first inventory row that has availability
+    remaining = quantity
+    for inv in invs:
+        free = inv.quantity_on_hand - inv.quantity_reserved
+        if free <= 0:
+            continue
+        take = min(free, remaining)
+        inv.quantity_reserved += take
+        inv.save(update_fields=["quantity_reserved", "updated_at"])
+        remaining -= take
+        if remaining == 0:
+            break
+
+    if remaining > 0:
+        # Fallback single row
+        inv = _get_or_create_inventory(product, batch, warehouse, location)
+        inv.quantity_reserved += remaining
+        inv.save(update_fields=["quantity_reserved", "updated_at"])
 
     StockMovement.objects.create(
         product=product,
@@ -84,7 +111,7 @@ def reserve_stock(
         reference=reference,
         created_by=user,
     )
-    return inv
+    return True
 
 @transaction.atomic
 def release_reservation(
@@ -101,10 +128,21 @@ def release_reservation(
     if quantity <= 0:
         raise ValidationError("Release quantity must be positive.")
 
-    inv = _get_or_create_inventory(product, batch, warehouse, location)
-
-    inv.quantity_reserved = max(0, inv.quantity_reserved - quantity)
-    inv.save(update_fields=["quantity_reserved", "updated_at"])
+    invs = Inventory.objects.filter(
+        product=product,
+        warehouse=warehouse,
+        batch=batch,
+    )
+    remaining = quantity
+    for inv in invs:
+        if inv.quantity_reserved <= 0:
+            continue
+        take = min(inv.quantity_reserved, remaining)
+        inv.quantity_reserved -= take
+        inv.save(update_fields=["quantity_reserved", "updated_at"])
+        remaining -= take
+        if remaining == 0:
+            break
 
     StockMovement.objects.create(
         product=product,
@@ -116,7 +154,7 @@ def release_reservation(
         reference=reference,
         created_by=user,
     )
-    return inv
+    return True
 
 @transaction.atomic
 def ship_stock(
@@ -134,17 +172,33 @@ def ship_stock(
     if quantity <= 0:
         raise ValidationError("Ship quantity must be positive.")
 
-    inv = _get_or_create_inventory(product, batch, warehouse, location)
-
-    if quantity > inv.quantity_reserved:
+    invs = list(
+        Inventory.objects.filter(
+            product=product,
+            warehouse=warehouse,
+            batch=batch,
+        )
+    )
+    total_on_hand = sum(i.quantity_on_hand for i in invs)
+    if quantity > total_on_hand:
         raise ValidationError(
-            f"Not enough reserved stock to ship. On hand: {inv.quantity_on_hand}"
+            f"Not enough on-hand stock to ship for {product.sku}. "
+            f"On hand: {total_on_hand}, requested: {quantity}"
         )
 
-    inv.quantity_on_hand -= quantity
-    inv.quantity_reserved -= quantity
-    inv.save(update_fields=["quantity_on_hand", "quantity_reserved", "updated_at"])
+    remaining = quantity
+    for inv in invs:
+        if inv.quantity_on_hand <= 0:
+            continue
+        take = min(inv.quantity_on_hand, remaining)
+        inv.quantity_on_hand -= take
+        inv.quantity_reserved = max(0, inv.quantity_reserved - take)
+        inv.save(update_fields=["quantity_on_hand", "quantity_reserved", "updated_at"])
+        remaining -= take
+        if remaining == 0:
+            break
 
+    
     StockMovement.objects.create(
         product=product,
         batch=batch,
@@ -156,4 +210,4 @@ def ship_stock(
         notes=notes,
         created_by=user,
     )
-    return inv
+    return True

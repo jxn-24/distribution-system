@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from decimal import Decimal
 from apps.inventory.models import Product, Warehouse, Batch
 from apps.users.models import User
+from django.core.exceptions import ValidationError
 
 class Customer(models.Model):
     CUSTOMER_TYPES = [
@@ -92,6 +93,60 @@ class SalesOrder(models.Model):
     @property
     def total_amount(self):
         return sum(item.line_total for item in self.items.all())
+
+    def save(self, *args, **kwargs):
+        old_status = None
+        if self.pk:
+           old_status = (
+               SalesOrder.objects.filter(pk=self.pk)
+               .values_list("status", flat=True)
+               .first()
+        )
+
+        super().save(*args, **kwargs)
+
+        # Only act when status changes to CONFIRMED
+        if self.status == "CONFIRMED" and old_status != "CONFIRMED":
+            from apps.inventory.services import reserve_stock
+            
+            for item in self.items.all():
+
+                if item.quantity_reserved >= item.quantity:
+                    continue  # Skip if already reserved
+                to_reserve = item.quantity - item.quantity_reserved
+                try:
+                    reserve_stock(
+                        product=item.product,
+                        batch=item.batch,
+                        warehouse=self.warehouse,
+                        quantity=to_reserve,
+                        reference=self.order_number,
+                        user=self.created_by,
+                    )
+                    item.quantity_reserved = item.quantity
+                    item.save(update_fields=["quantity_reserved"])
+                except Exception as e:
+                    raise ValidationError(
+                        "Could not reserve stock for {item.product.sku}: {e}")
+        # Release when moving from CONFIRMED → CANCELLED
+        if self.status == "CANCELLED" and old_status == "CONFIRMED":
+            from apps.inventory.services import release_reservation 
+
+            for item in self.items.all():
+                if item.quantity_reserved <= 0:
+                    continue  # Skip if nothing reserved
+                release_reservation(
+                    product=item.product,
+                    batch=item.batch,
+                    warehouse=self.warehouse,
+                    quantity=item.quantity_reserved,
+                    reference=self.order_number,
+                    user=self.created_by,
+                
+            )
+            item.quantity_reserved = 0
+            item.save(update_fields=["quantity_reserved"])
+
 
 class SalesOrderItem(models.Model):
     sales_order = models.ForeignKey(

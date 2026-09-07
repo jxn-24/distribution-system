@@ -131,27 +131,45 @@ class GoodsReceiptItem(models.Model):
         related_name="items"
     )
     product = models.ForeignKey(
-        Product,
+        "inventory.Product",
         on_delete=models.PROTECT,
         related_name="receipt_items"
     )
     batch = models.ForeignKey(
-        Batch,
+        "inventory.Batch",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="receipt_items"
     )
     location = models.ForeignKey(
-        StockLocation,
+        "inventory.StockLocation",
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
         related_name="receipt_items"
     )
-    quantity_received = models.PositiveIntegerField(validators=[MinValueValidator(1)])
+    quantity_received = models.PositiveIntegerField()
     notes = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.goods_receipt.receipt_number} - {self.product.sku}"
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+
+        if is_new:
+            from apps.inventory.services import receive_stock
+            receipt = self.goods_receipt
+            receive_stock(
+                product=self.product,
+                batch=self.batch,
+                warehouse=receipt.warehouse,
+                location=self.location,
+                quantity=self.quantity_received,
+                reference=receipt.receipt_number,
+                notes=f"Auto from Goods Receipt {receipt.receipt_number}",
+                user=receipt.received_by,
+            )
 

@@ -3,9 +3,10 @@
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import AppShell from "@/components/AppShell";
 
 export default function DashboardPage() {
-  const { user, logout, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -25,8 +26,7 @@ export default function DashboardPage() {
   if (!user) return null;
 
   const roleNames = user.roles.map((r) => r.name);
-  const mainRole = roleNames[0] || "User";
-
+  
   // USER ROLES AND SPECIFICATIONS
 
   const getRoleContent = () => {
@@ -225,70 +225,45 @@ export default function DashboardPage() {
   const content = getRoleContent();
 
   return (
-    <div className="min-h-screen bg-gray-100 text-black">
-      {/* Header */}
-      <header className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div>
-            <h1 className="text-xl font-bold text-black">Distribution System</h1>
-            <p className="text-sm text-gray-600">Role-based Dashboard</p>
+    <AppShell>
+      {/* Role Banner */}
+      <div className={`${content.color} text-white rounded-xl p-6 mb-8`}>
+        <h2 className="text-2xl font-bold mb-1">{content.title}</h2>
+        <p className="opacity-90">{content.subtitle}</p>
+      </div>
+
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {content.cards.map((card, index) => (
+          <div key={index} className="bg-white rounded-xl shadow p-5">
+            <p className="text-sm text-gray-500 mb-1">{card.label}</p>
+            <p className="text-2xl font-bold text-black">{card.value}</p>
+            <p className="text-xs text-gray-400 mt-1">{card.desc}</p>
           </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-medium text-black">{user.username}</p>
-              <p className="text-xs text-gray-500">{mainRole}</p>
-            </div>
-            <button
-              onClick={logout}
-              className="text-sm bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
+        ))}
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Role Banner */}
-        <div className={`${content.color} text-white rounded-xl p-6 mb-8`}>
-          <h2 className="text-2xl font-bold mb-1">{content.title}</h2>
-          <p className="opacity-90">{content.subtitle}</p>
-        </div>
-
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {content.cards.map((card, index) => (
-            <div key={index} className="bg-white rounded-xl shadow p-5">
-              <p className="text-sm text-gray-500 mb-1">{card.label}</p>
-              <p className="text-2xl font-bold text-black">{card.value}</p>
-              <p className="text-xs text-gray-400 mt-1">{card.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Quick Links + Notes */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 bg-white rounded-xl shadow p-6">
-            <h3 className="font-semibold text-black mb-4">Quick Actions</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {content.quickLinks.map((link, index) => (
-                <div
-                  key={index}
-                  className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
-                >
-                  {link}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="font-semibold text-black mb-3">Access Notes</h3>
-            <p className="text-sm text-gray-600 leading-relaxed">{content.notes}</p>
+      {/* Quick Links + Notes */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow p-6">
+          <h3 className="font-semibold text-black mb-4">Quick Actions</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {content.quickLinks.map((link, index) => (
+              <div
+                key={index}
+                className="border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 cursor-pointer"
+              >
+                {link}
+              </div>
+            ))}
           </div>
         </div>
-      </main>
-    </div>
+
+        <div className="bg-white rounded-xl shadow p-6">
+          <h3 className="font-semibold text-black mb-3">Access Notes</h3>
+          <p className="text-sm text-gray-600 leading-relaxed">{content.notes}</p>
+        </div>
+      </div>
+    </AppShell>
   );
 }

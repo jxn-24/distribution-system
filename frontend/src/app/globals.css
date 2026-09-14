@@ -3,24 +3,28 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --luna-black: #0a0a0a;
+  --luna-gold: #f5c518;
+  --luna-gold-soft: #e8b923;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-figtree), system-ui, sans-serif;
+  --font-display: var(--font-outfit), system-ui, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-figtree), system-ui, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-outfit), system-ui, sans-serif;
+}
+
+.font-body {
+  font-family: var(--font-figtree), system-ui, sans-serif;
 }

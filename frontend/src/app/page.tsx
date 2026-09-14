@@ -3,72 +3,58 @@
 import Link from "next/link";
 
 export default function HomePage() {
-  const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
   return (
-    <div className="min-h-screen bg-white text-gray-900">
-      {/* ========== HEADER ========== */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
-  <div className="w-10 h-10 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-lg">
-    TL
-  </div>
-  <span className="text-xl font-bold text-blue-800">
-    Three-Level Distribution
-  </span>
-</div>
+    <div className="min-h-screen bg-white text-neutral-900 font-body">
+      {/* ===== HEADER ===== */}
+      <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+            className="flex items-center gap-3 cursor-pointer"
+          >
+            {/* Logo placeholder — swap for real logo later */}
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-amber-500 flex items-center justify-center">
+              <span className="text-black font-display font-bold text-sm">LS</span>
+            </div>
+            <div className="text-left">
+              <p className="font-display font-semibold text-white text-sm tracking-wide">
+                LUNA SOFT
+              </p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-400/90">
+                Essentials
+              </p>
+            </div>
+          </button>
 
-          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
-            <button
-              onClick={() => scrollToSection("about")}
-              className="hover:text-orange-500 transition"
-            >
-              About
+          <nav className="hidden md:flex items-center gap-8 text-sm text-white/80">
+            <button onClick={() => scrollTo("story")} className="hover:text-amber-400 transition">
+              Our Story
             </button>
-            <button
-              onClick={() => scrollToSection("vision")}
-              className="hover:text-orange-500 transition"
-            >
-              Vision & Mission
+            <button onClick={() => scrollTo("products")} className="hover:text-amber-400 transition">
+              Products
             </button>
-            <button
-              onClick={() => scrollToSection("contact")}
-              className="hover:text-orange-500 transition"
-            >
+            <button onClick={() => scrollTo("promise")} className="hover:text-amber-400 transition">
+              Promise
+            </button>
+            <button onClick={() => scrollTo("contact")} className="hover:text-amber-400 transition">
               Contact
             </button>
-
-            <Link
-              href="/login"
-              className="text-blue-700 border border-blue-700 px-5 py-2 rounded-lg hover:bg-blue-50 transition"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
-              className="bg-orange-500 text-white px-5 py-2 rounded-lg hover:bg-orange-600 transition"
-            >
-              Sign Up
-            </Link>
           </nav>
 
-          {/* Mobile Buttons */}
-          <div className="flex md:hidden items-center gap-2">
+          <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/login"
-              className="text-blue-700 border border-blue-700 px-3 py-1.5 rounded-lg text-sm"
+              className="text-sm text-white/90 border border-white/25 px-4 py-2 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="bg-orange-500 text-white px-3 py-1.5 rounded-lg text-sm"
+              className="text-sm bg-amber-400 text-black font-medium px-4 py-2 rounded-full hover:bg-amber-300 transition"
             >
               Sign Up
             </Link>
@@ -76,148 +62,210 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ========== HERO SECTION ========== */}
-      <section className="bg-gradient-to-br from-blue-800 via-blue-700 to-blue-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 py-20 md:py-28 flex flex-col md:flex-row items-center gap-12">
-          <div className="flex-1">
-            <h1 className="text-4xl md:text-5xl font-bold leading-tight mb-6">
-              Reliable Distribution. <br />
-              <span className="text-orange-400">Strong Supply Chain.</span>
-            </h1>
-            <p className="text-lg text-blue-100 mb-8 max-w-xl">
-              Three-Level Distribution specializes in the efficient supply of essential hygiene products 
-              including sanitary pads, diapers, hair oil and more — connecting manufacturers to markets 
-              with excellence.
+      {/* ===== HERO (editorial) ===== */}
+      <section className="bg-black text-white">
+        <div className="max-w-6xl mx-auto px-4 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="text-amber-400 text-xs font-medium tracking-[0.25em] uppercase mb-4">
+              Gentle care. Strong protection.
             </p>
-            <div className="flex flex-wrap gap-4">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.1] mb-6">
+              Softness you feel.
+              <span className="block text-amber-400">Confidence you keep.</span>
+            </h1>
+            <p className="text-white/70 text-lg max-w-md mb-8 font-body leading-relaxed">
+              Luna Soft Essentials brings everyday hygiene products designed for
+              comfort, dignity, and reliable protection — for every body, every day.
+            </p>
+            <div className="flex flex-wrap gap-3">
+              <button
+                onClick={() => scrollTo("products")}
+                className="bg-amber-400 text-black font-medium px-6 py-3 rounded-full hover:bg-amber-300 transition"
+              >
+                Explore products
+              </button>
               <Link
                 href="/login"
-                className="bg-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-600 transition"
+                className="border border-white/30 text-white px-6 py-3 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
               >
-                Access Your Account
+                Partner login
               </Link>
-              <button
-                onClick={() => scrollToSection("about")}
-                className="border border-white text-white px-6 py-3 rounded-lg font-medium hover:bg-white hover:text-blue-800 transition"
-              >
-                Learn More
-              </button>
             </div>
           </div>
 
-          <div className="flex-1 flex justify-center">
-            <div className="w-72 h-72 md:w-80 md:h-80 bg-white/10 rounded-full flex items-center justify-center border-4 border-orange-400">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-orange-400 mb-2">TL</div>
-                <p className="text-sm text-blue-100">Three-Level Distribution</p>
+          {/* Abstract product stage — replace with real pack shots later */}
+          <div className="relative flex justify-center">
+            <div className="w-64 h-64 md:w-80 md:h-80 rounded-[2rem] bg-gradient-to-br from-neutral-900 via-neutral-800 to-black border border-amber-400/30 shadow-2xl shadow-amber-500/10 flex flex-col items-center justify-center text-center p-8">
+              <div className="w-16 h-16 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center mb-4">
+                <span className="font-display text-amber-400 text-2xl">☾</span>
               </div>
+              <p className="font-display text-2xl text-white tracking-wide">LUNA SOFT</p>
+              <p className="text-amber-400/90 text-xs tracking-[0.2em] uppercase mt-2">
+                Essentials
+              </p>
+              <p className="text-white/50 text-sm mt-4">Sanitary care · Adult care</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========== ABOUT SECTION ========== */}
-      <section id="about" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-blue-800 mb-3">Who We Are</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              We are a distribution company focused on bridging the gap between manufacturers 
-              and the market through efficient warehousing, logistics, and supply chain management.
+      {/* ===== STORY ===== */}
+      <section id="story" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10">
+          <div className="md:col-span-4">
+            <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-3">Our story</p>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold text-black leading-tight">
+              Built for real life, not the shelf alone.
+            </h2>
+          </div>
+          <div className="md:col-span-8 space-y-4 text-neutral-600 text-lg leading-relaxed">
+            <p>
+              Luna Soft Essentials is a distribution-led brand focused on essential
+              hygiene — from sanitary pads to adult care — with packaging and product
+              quality that feel premium without being distant.
             </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-500">
-              <h3 className="text-lg font-bold text-blue-800 mb-2">Our Products</h3>
-              <p className="text-gray-600 text-sm">
-                Essential hygiene products including sanitary pads, diapers, hair oil and related consumer goods.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-blue-600">
-              <h3 className="text-lg font-bold text-blue-800 mb-2">Our Network</h3>
-              <p className="text-gray-600 text-sm">
-                We work with manufacturers, wholesalers, retailers and sales agents to ensure products reach the market efficiently.
-              </p>
-            </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm border-t-4 border-orange-500">
-              <h3 className="text-lg font-bold text-blue-800 mb-2">Our Strength</h3>
-              <p className="text-gray-600 text-sm">
-                Strong inventory control, reliable logistics, and a technology-driven distribution system.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ========== VISION & MISSION ========== */}
-      <section id="vision" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 gap-12">
-          <div className="bg-blue-800 text-white p-8 rounded-2xl">
-            <h3 className="text-2xl font-bold mb-4 text-orange-400">Our Vision</h3>
-            <p className="text-blue-100 leading-relaxed">
-              To become the most reliable and efficient distribution partner for essential consumer products, 
-              empowering businesses and improving product availability across the region.
-            </p>
-          </div>
-
-          <div className="bg-orange-500 text-white p-8 rounded-2xl">
-            <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-            <p className="leading-relaxed">
-              To deliver quality products through a well-managed supply chain, supported by technology, 
-              strong partnerships, and a commitment to excellence in service and reliability.
+            <p>
+              We connect manufacturers to markets through careful warehousing,
+              clear inventory, and partners who care about availability and trust.
             </p>
           </div>
         </div>
       </section>
 
-      {/* ========== CONTACT SECTION ========== */}
-      <section id="contact" className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-blue-800 mb-3">Contact Us</h2>
-            <p className="text-gray-600">We would love to hear from you</p>
+      {/* ===== PRODUCTS ===== */}
+      <section id="products" className="py-20 bg-neutral-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
+            <div>
+              <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-3">Range</p>
+              <h2 className="font-display text-3xl md:text-4xl font-semibold text-black">
+                Care that shows up.
+              </h2>
+            </div>
+            <p className="text-neutral-500 max-w-sm text-sm">
+              Bold on the outside. Soft where it matters. Designed for everyday confidence.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-              <div className="text-orange-500 text-2xl mb-3">📍</div>
-              <h4 className="font-semibold mb-1">Location</h4>
-              <p className="text-sm text-gray-600">Nairobi, Kenya</p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Luna Soft Pads",
+                blurb: "Ultra soft · Leak protection · Breathable comfort",
+                tag: "Sanitary care",
+              },
+              {
+                title: "Adult Tape Diapers",
+                blurb: "Max absorbency · Overnight protection · Secure fit",
+                tag: "Adult care",
+              },
+              {
+                title: "Adult Pants",
+                blurb: "Flexible fit · Discreet comfort · All-day wear",
+                tag: "Adult care",
+              },
+            ].map((item) => (
+              <div
+                key={item.title}
+                className="group bg-black text-white rounded-3xl p-6 border border-white/5 hover:border-amber-400/40 transition shadow-lg"
+              >
+                <p className="text-amber-400 text-[10px] tracking-[0.2em] uppercase mb-4">
+                  {item.tag}
+                </p>
+                <div className="h-28 rounded-2xl bg-gradient-to-br from-neutral-800 to-neutral-950 border border-amber-400/20 mb-5 flex items-center justify-center">
+                  <span className="font-display text-amber-400/80 text-3xl">☾</span>
+                </div>
+                <h3 className="font-display text-xl font-semibold mb-2">{item.title}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{item.blurb}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== PROMISE ===== */}
+      <section id="promise" className="py-20 bg-black text-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <p className="text-amber-400 text-xs tracking-[0.2em] uppercase mb-3 text-center">
+            Our promise
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-center mb-14">
+            Soft on skin. Serious on quality.
+          </h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                t: "Comfort first",
+                d: "Materials and fit chosen for all-day wear without compromise.",
+              },
+              {
+                t: "Reliable supply",
+                d: "Distribution systems that keep partners stocked and shelves ready.",
+              },
+              {
+                t: "Clear standards",
+                d: "Batch tracking, expiry awareness, and accountable handling.",
+              },
+            ].map((x) => (
+              <div key={x.t} className="text-center px-4">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full border border-amber-400/40 flex items-center justify-center text-amber-400">
+                  ✦
+                </div>
+                <h3 className="font-display text-lg font-semibold mb-2">{x.t}</h3>
+                <p className="text-white/60 text-sm leading-relaxed">{x.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ===== CONTACT ===== */}
+      <section id="contact" className="py-20 bg-white">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-3">Contact</p>
+          <h2 className="font-display text-3xl font-semibold text-black mb-4">
+            Let’s work together
+          </h2>
+          <p className="text-neutral-600 max-w-lg mx-auto mb-10">
+            Wholesalers, retailers, and partners — reach out to stock Luna Soft Essentials
+            or access the distribution portal.
+          </p>
+          <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto text-sm">
+            <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100">
+              <p className="text-amber-600 font-medium mb-1">Location</p>
+              <p className="text-neutral-600">Kikuyu, Kenya</p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-              <div className="text-orange-500 text-2xl mb-3">📧</div>
-              <h4 className="font-semibold mb-1">Email</h4>
-              <p className="text-sm text-gray-600">info@threelevel.com</p>
+            <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100">
+              <p className="text-amber-600 font-medium mb-1">Email</p>
+              <p className="text-neutral-600">info@lunasoft.co.ke</p>
             </div>
-            <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-              <div className="text-orange-500 text-2xl mb-3">📞</div>
-              <h4 className="font-semibold mb-1">Phone</h4>
-              <p className="text-sm text-gray-600">+254 700 000 000</p>
+            <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100">
+              <p className="text-amber-600 font-medium mb-1">Phone</p>
+              <p className="text-neutral-600">+254 7XX XXX XXX</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* ========== FOOTER ========== */}
-      <footer className="bg-blue-900 text-white py-10">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
+      {/* ===== FOOTER ===== */}
+      <footer className="bg-black text-white border-t border-white/10 py-10">
+        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-orange-500 rounded-lg flex items-center justify-center font-bold">
-              TL
+            <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center">
+              <span className="text-black font-display font-bold text-xs">LS</span>
             </div>
-            <span className="font-semibold">Three-Level Distribution</span>
+            <div>
+              <p className="font-display font-semibold text-sm">LUNA SOFT ESSENTIALS</p>
+              <p className="text-[10px] text-white/40 tracking-wider">GENTLE CARE. STRONG PROTECTION.</p>
+            </div>
           </div>
-
-          <div className="flex gap-6 text-sm text-blue-200">
-            <a href="#" className="hover:text-orange-400 transition">Facebook</a>
-            <a href="#" className="hover:text-orange-400 transition">Instagram</a>
-            <a href="#" className="hover:text-orange-400 transition">LinkedIn</a>
-            <a href="#" className="hover:text-orange-400 transition">X (Twitter)</a>
+          <div className="flex gap-5 text-sm text-white/50">
+            <a href="#" className="hover:text-amber-400 transition">Instagram</a>
+            <a href="#" className="hover:text-amber-400 transition">Facebook</a>
+            <a href="#" className="hover:text-amber-400 transition">TikTok</a>
           </div>
-
-          <p className="text-sm text-blue-300">
-            © {new Date().getFullYear()} Three-Level Distribution. All rights reserved.
+          <p className="text-xs text-white/40">
+            © {new Date().getFullYear()} Luna Soft Essentials. All rights reserved.
           </p>
         </div>
       </footer>

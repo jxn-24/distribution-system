@@ -20,6 +20,21 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ("sku", "name")
     inlines = [BatchInline]
     readonly_fields = ("created_at", "updated_at")
+    ffieldsets = (
+        (None, {
+            "fields": ("sku", "name", "description", "category", "unit", "image"),
+        }),
+        ("Pricing (KES)", {
+            "fields": ("cost_price", "selling_price"),
+            "description": "All amounts in Kenya Shillings. Selling price changes require Director/Super Admin approval.",
+        }),
+        ("Stock settings", {
+            "fields": ("track_batches", "min_stock_level", "is_active"),
+        }),
+        ("Timestamps", {
+            "fields": ("created_at", "updated_at"),
+        }),
+    )
 
 @admin.register(Batch)
 class BatchAdmin(admin.ModelAdmin):

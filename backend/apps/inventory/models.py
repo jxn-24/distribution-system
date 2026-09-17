@@ -25,6 +25,7 @@ class Product(models.Model):
         ("carton", "Carton"),
         ("kg", "Kilogram"),
         ("liter", "Liter"),
+        ("bag", "Bag"),
     ]
 
     sku = models.CharField(max_length=50, unique=True, help_text="Unique Stock Keeping Unit")

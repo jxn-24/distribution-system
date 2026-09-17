@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 
 export default function HomePage() {
   const scrollTo = (id: string) => {
@@ -16,10 +17,14 @@ export default function HomePage() {
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-3 cursor-pointer"
           >
-            {/* Logo placeholder — swap for real logo later */}
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-amber-500 flex items-center justify-center">
-              <span className="text-black font-display font-bold text-sm">LS</span>
-            </div>
+            <Image
+              src="/images/Luna_Soft_Essentials_logo.jpeg"
+              alt="Luna Soft Essentials"
+              width={56}
+              height={56}
+              className="h-12 w-12 sm:h-14 sm:w-14 object-contain"
+              priority
+            />
             <div className="text-left">
               <p className="font-display font-semibold text-white text-sm tracking-wide">
                 LUNA SOFT
@@ -48,21 +53,15 @@ export default function HomePage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/login"
-              className="text-sm text-white/90 border border-white/25 px-4 py-2 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
-            >
-              Login
-            </Link>
-            <Link
-              href="/signup"
               className="text-sm bg-amber-400 text-black font-medium px-4 py-2 rounded-full hover:bg-amber-300 transition"
             >
-              Sign Up
+              Login
             </Link>
           </div>
         </div>
       </header>
 
-      {/* ===== HERO (editorial) ===== */}
+      {/* ===== HERO ===== */}
       <section className="bg-black text-white">
         <div className="max-w-6xl mx-auto px-4 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
           <div>
@@ -88,17 +87,20 @@ export default function HomePage() {
                 href="/login"
                 className="border border-white/30 text-white px-6 py-3 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
               >
-                Partner login
+                Staff login
               </Link>
             </div>
           </div>
 
-          {/* Abstract product stage — replace with real pack shots later */}
           <div className="relative flex justify-center">
-            <div className="w-64 h-64 md:w-80 md:h-80 rounded-[2rem] bg-gradient-to-br from-neutral-900 via-neutral-800 to-black border border-amber-400/30 shadow-2xl shadow-amber-500/10 flex flex-col items-center justify-center text-center p-8">
-              <div className="w-16 h-16 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center mb-4">
-                <span className="font-display text-amber-400 text-2xl">☾</span>
-              </div>
+            <div className="w-64 h-64 md:w-80 md:h-80 rounded-[2rem] bg-gradient-to-br from-neutral-900 via-neutral-800 to-black border border-amber-400/30 shadow-2xl shadow-amber-500/10 flex flex-col items-center justify-center text-center p-6 md:p-8">
+              <Image
+                src="/images/Luna_Soft_Essentials_logo.jpeg"
+                alt="Luna Soft Essentials"
+                width={220}
+                height={220}
+                className="h-24 w-24 object-contain mb-4"
+              />
               <p className="font-display text-2xl text-white tracking-wide">LUNA SOFT</p>
               <p className="text-amber-400/90 text-xs tracking-[0.2em] uppercase mt-2">
                 Essentials
@@ -173,7 +175,13 @@ export default function HomePage() {
                   {item.tag}
                 </p>
                 <div className="h-28 rounded-2xl bg-gradient-to-br from-neutral-800 to-neutral-950 border border-amber-400/20 mb-5 flex items-center justify-center">
-                  <span className="font-display text-amber-400/80 text-3xl">☾</span>
+                  <Image
+                    src="/images/Luna_Soft_Essentials_logo.jpeg"
+                    alt=""
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 object-contain opacity-90"
+                  />
                 </div>
                 <h3 className="font-display text-xl font-semibold mb-2">{item.title}</h3>
                 <p className="text-white/60 text-sm leading-relaxed">{item.blurb}</p>
@@ -227,8 +235,8 @@ export default function HomePage() {
             Let’s work together
           </h2>
           <p className="text-neutral-600 max-w-lg mx-auto mb-10">
-            Wholesalers, retailers, and partners — reach out to stock Luna Soft Essentials
-            or access the distribution portal.
+            Wholesalers and retailers — contact our sales team to place orders.
+            Staff access the distribution system via Login.
           </p>
           <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto text-sm">
             <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100">
@@ -251,18 +259,30 @@ export default function HomePage() {
       <footer className="bg-black text-white border-t border-white/10 py-10">
         <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center">
-              <span className="text-black font-display font-bold text-xs">LS</span>
-            </div>
+            <Image
+              src="/images/Luna_Soft_Essentials_logo.jpeg"
+              alt="Luna Soft Essentials"
+              width={48}
+              height={48}
+              className="h-12 w-12 object-contain"
+            />
             <div>
               <p className="font-display font-semibold text-sm">LUNA SOFT ESSENTIALS</p>
-              <p className="text-[10px] text-white/40 tracking-wider">GENTLE CARE. STRONG PROTECTION.</p>
+              <p className="text-[10px] text-white/40 tracking-wider">
+                GENTLE CARE. STRONG PROTECTION.
+              </p>
             </div>
           </div>
           <div className="flex gap-5 text-sm text-white/50">
-            <a href="#" className="hover:text-amber-400 transition">Instagram</a>
-            <a href="#" className="hover:text-amber-400 transition">Facebook</a>
-            <a href="#" className="hover:text-amber-400 transition">TikTok</a>
+            <a href="#" className="hover:text-amber-400 transition">
+              Instagram
+            </a>
+            <a href="#" className="hover:text-amber-400 transition">
+              Facebook
+            </a>
+            <a href="#" className="hover:text-amber-400 transition">
+              TikTok
+            </a>
           </div>
           <p className="text-xs text-white/40">
             © {new Date().getFullYear()} Luna Soft Essentials. All rights reserved.

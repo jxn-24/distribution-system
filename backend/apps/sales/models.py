@@ -44,6 +44,8 @@ class SalesOrder(models.Model):
     STATUS_CHOICES = [
         ("DRAFT", "Draft"),
         ("CONFIRMED", "Confirmed"),
+        ("PAID", "Paid"),
+        ("READY_TO_PACK", "Ready to Pack"),
         ("PICKING", "Picking"),
         ("PACKED", "Packed"),
         ("SHIPPED", "Shipped"),
@@ -55,7 +57,7 @@ class SalesOrder(models.Model):
     customer = models.ForeignKey(
         Customer,
         on_delete=models.PROTECT,
-        related_name="sales_orders"
+        related_name="sales_orders",
     )
     sales_agent = models.ForeignKey(
         User,
@@ -63,7 +65,7 @@ class SalesOrder(models.Model):
         null=True,
         blank=True,
         related_name="agent_orders",
-        help_text="Optional sales agent who closed the deal"
+        help_text="Optional sales agent who closed the deal",
     )
     order_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="DRAFT")
@@ -71,7 +73,7 @@ class SalesOrder(models.Model):
         Warehouse,
         on_delete=models.PROTECT,
         related_name="sales_orders",
-        help_text="Warehouse that will fulfil this order"
+        help_text="Warehouse that will fulfil this order",
     )
     notes = models.TextField(blank=True, null=True)
     created_by = models.ForeignKey(
@@ -79,7 +81,7 @@ class SalesOrder(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="sales_orders_created"
+        related_name="sales_orders_created",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -97,22 +99,21 @@ class SalesOrder(models.Model):
     def save(self, *args, **kwargs):
         old_status = None
         if self.pk:
-           old_status = (
-               SalesOrder.objects.filter(pk=self.pk)
-               .values_list("status", flat=True)
-               .first()
-        )
+            old_status = (
+                SalesOrder.objects.filter(pk=self.pk)
+                .values_list("status", flat=True)
+                .first()
+            )
 
         super().save(*args, **kwargs)
 
-        # Only act when status changes to CONFIRMED
+        # RESERVE: only when entering CONFIRMED (once)
         if self.status == "CONFIRMED" and old_status != "CONFIRMED":
             from apps.inventory.services import reserve_stock
-            
-            for item in self.items.all():
 
+            for item in self.items.all():
                 if item.quantity_reserved >= item.quantity:
-                    continue  # Skip if already reserved
+                    continue
                 to_reserve = item.quantity - item.quantity_reserved
                 try:
                     reserve_stock(
@@ -127,27 +128,38 @@ class SalesOrder(models.Model):
                     item.save(update_fields=["quantity_reserved"])
                 except Exception as e:
                     raise ValidationError(
-                        "Could not reserve stock for {item.product.sku}: {e}")
-        # Release when moving from CONFIRMED → CANCELLED
-        if self.status == "CANCELLED" and old_status == "CONFIRMED":
-            from apps.inventory.services import release_reservation 
+                        f"Could not reserve stock for {item.product.sku}: {e}"
+                    )
+
+        # RELEASE: only when cancelling an order that still holds reserved stock
+        RESERVED_STATUSES = {
+            "CONFIRMED",
+            "PAID",
+            "READY_TO_PACK",
+            "PICKING",
+            "PACKED",
+        }
+        if self.status == "CANCELLED" and old_status in RESERVED_STATUSES:
+            from apps.inventory.services import release_reservation
 
             for item in self.items.all():
                 if item.quantity_reserved <= 0:
-                    continue  # Skip if nothing reserved
-                release_reservation(
-                    product=item.product,
-                    batch=item.batch,
-                    warehouse=self.warehouse,
-                    quantity=item.quantity_reserved,
-                    reference=self.order_number,
-                    user=self.created_by,
-                
-            )
-            item.quantity_reserved = 0
-            item.save(update_fields=["quantity_reserved"])
-
-
+                    continue
+                try:
+                    release_reservation(
+                        product=item.product,
+                        batch=item.batch,
+                        warehouse=self.warehouse,
+                        quantity=item.quantity_reserved,
+                        reference=self.order_number,
+                        user=self.created_by,
+                    )
+                    item.quantity_reserved = 0
+                    item.save(update_fields=["quantity_reserved"])
+                except Exception as e:
+                    raise ValidationError(
+                        f"Could not release reserved stock for {item.product.sku}: {e}"
+                    )
 class SalesOrderItem(models.Model):
     sales_order = models.ForeignKey(
         SalesOrder,

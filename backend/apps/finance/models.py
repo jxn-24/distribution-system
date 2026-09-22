@@ -52,6 +52,19 @@ class Invoice(models.Model):
     def balance_due(self):
         return self.total_amount - self.amount_paid
 
+    def save(self, *args, **kwargs):
+
+        if self.sales_order_id and (
+            self.total_amount is None or self.total_amount == 0
+        ):
+            order_total = self.sales_order.total_amount or Decimal("0.00")
+            self.subtotal = order_total
+            self.total_amount = order_total
+            if not self.customer_id and self.sales_order.customer_id:
+                self.customer = self.sales_order.customer
+
+        super().save(*args, **kwargs)
+
 class Receipt(models.Model):
     PAYMENT_METHODS = [
         ("CASH", "Cash"),

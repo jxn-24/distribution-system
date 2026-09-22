@@ -40,3 +40,5 @@ class SalesOrderViewSet(viewsets.ModelViewSet):
         if user.is_customer:
             return qs.filter(customer__user=user)
         return qs.none()
+
+        

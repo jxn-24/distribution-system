@@ -25,10 +25,16 @@ const navItems = [
     roles: ["Super Admin", "Admin", "Director", "Warehouse", "Finance"],
   },
   {
+    href: "/ready-to-pack",
+    label: "Ready to Pack",
+    roles: ["Super Admin", "Admin", "Director", "Warehouse"],
+  },
+  {
     href: "/shipments",
     label: "Shipments",
     roles: ["Super Admin", "Admin", "Warehouse", "Sales", "Finance"],
   },
+  
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {

@@ -7,5 +7,6 @@ urlpatterns = [
     path('api/inventory/', include('apps.inventory.urls')),
     path('api/sales/', include('apps.sales.urls')),
     path('api/purchasing/', include('apps.purchasing.urls')),
-    path('api/warehouse/', include('apps.warehouse.urls'))
+    path('api/warehouse/', include('apps.warehouse.urls')),
+    path("api/finance/", include("apps.finance.urls")),
 ]

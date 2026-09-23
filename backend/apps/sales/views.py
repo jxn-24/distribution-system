@@ -1,3 +1,5 @@
+import re
+
 from rest_framework import viewsets, permissions
 from apps.users.permissions import IsAdminUser, IsSalesUser, IsSalesAgent, IsCustomerUser
 from .models import Customer, SalesOrder
@@ -29,11 +31,15 @@ class SalesOrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
-        qs = SalesOrder.objects.all().select_related("customer", "warehouse", "sales_agent")
+        qs = SalesOrder.objects.all().select_related(
+            "customer", "warehouse", "sales_agent"
+        )
 
         if user.is_super_admin or user.is_admin_user:
             return qs
         if user.is_sales or user.is_finance or user.is_director:
+            return qs
+        if getattr(user, "is_warehouse", False):
             return qs
         if user.is_sales_agent:
             return qs.filter(sales_agent=user)

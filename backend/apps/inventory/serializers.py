@@ -23,10 +23,22 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = [
-            "id", "sku", "name", "description", "category", "category_name",
+            "id", "sku", "barcode", "name", "description", "category", "category_name",
             "unit", "cost_price", "selling_price", "track_batches",
             "min_stock_level", "is_active", "image", "batches"
         ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        if request and (request.user.is_customer or request.user.is_sales or request.user.is_sales_agent):
+            for field_name in ("quantity_on_hand", "quantity_reserved", "warehouse", "location", "batch", "updated_at"):
+                fields.pop(field_name, None)
+        if request and (request.user.is_warehouse or request.user.is_customer):
+            fields.pop("selling_price", None)
+        if request and not (request.user.is_admin_user or request.user.is_director or request.user.is_finance):
+            fields.pop("cost_price", None)
+        return fields
 
 class WarehouseSerializer(serializers.ModelSerializer):
     class Meta:

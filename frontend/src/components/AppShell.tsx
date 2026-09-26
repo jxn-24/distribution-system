@@ -6,12 +6,13 @@ import { useAuth } from "@/lib/auth-context";
 import { useEffect } from "react";
 
 const navItems = [
-    { href: "/dashboard", label: "Dashboard", roles: ["all"] },
-    { href: "/products", label: "Products", roles: ["all"] },
-    { href: "/inventory", label: "Inventory", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales", "Finance"] },
-    { href: "/sales-orders", label: "Sales Orders", roles: ["Super Admin", "Admin", "Director", "Sales", "Finance", "Sales Agent", "Customer"] },
-    { href: "/purchase-orders", label: "Purchase Orders", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Finance"] },
-    { href: "/shipments", label: "Shipments", roles: ["Super Admin", "Admin", "Warehouse", "Sales", "Finance"] },
+  { href: "/dashboard", label: "Dashboard", roles: ["Super Admin", "Director", "Admin", "Warehouse", "Sales / Account Managers", "Account Manager", "Finance", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/products", label: "Products", roles: ["Super Admin", "Director", "Admin", "Warehouse", "Sales / Account Managers", "Account Manager", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/inventory", label: "Inventory", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales / Account Managers", "Account Manager", "Sales", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/sales-orders", label: "Sales Orders", roles: ["Super Admin", "Admin", "Director", "Sales / Account Managers", "Account Manager", "Sales", "Finance", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/purchase-orders", label: "Purchase Orders", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Finance"] },
+  { href: "/shipments", label: "Shipments", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales / Account Managers", "Account Manager", "Sales"] },
+  { href: "/warehouse/scan", label: "Scan Stock", roles: ["Super Admin", "Admin", "Warehouse"] },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -44,17 +45,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 text-black flex">
+      <div className="min-h-screen bg-neutral-100 text-neutral-950 flex">
       {/* Sidebar */}
-      <aside className="w-64 bg-blue-900 text-white flex flex-col">
-        <div className="p-5 border-b border-blue-800">
+      <aside className="w-64 bg-neutral-950 text-neutral-100 flex flex-col border-r border-neutral-800">
+        <div className="p-5 border-b border-neutral-800">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center font-bold text-sm">
-              TL
+            <div className="w-9 h-9 rounded-full border border-amber-400/60 bg-amber-400/10 flex items-center justify-center text-amber-300 font-display text-2xl leading-none">
+              ☾
             </div>
             <div>
-              <p className="font-bold text-sm">Three-Level</p>
-              <p className="text-xs text-blue-200">Distribution</p>
+              <p className="font-display font-semibold text-sm tracking-wide">LUNA SOFT</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</p>
             </div>
           </div>
         </div>
@@ -68,8 +69,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`block px-3 py-2 rounded-lg text-sm transition ${
                   active
-                    ? "bg-orange-500 text-white"
-                    : "text-blue-100 hover:bg-blue-800"
+                    ? "bg-amber-400 text-neutral-950 font-semibold"
+                    : "text-neutral-300 hover:bg-neutral-800 hover:text-white"
                 }`}
               >
                 {item.label}
@@ -78,14 +79,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-blue-800">
+        <div className="p-4 border-t border-neutral-800">
           <p className="text-sm font-medium">{user.username}</p>
-          <p className="text-xs text-blue-300 mb-3">
+          <p className="text-xs text-neutral-400 mb-3">
             {roleNames.join(", ")}
           </p>
           <button
             onClick={logout}
-            className="w-full text-sm bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg transition"
+            className="w-full text-sm border border-neutral-600 text-neutral-200 hover:border-amber-400 hover:text-amber-300 px-3 py-2 rounded-md transition"
           >
             Logout
           </button>

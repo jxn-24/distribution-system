@@ -25,7 +25,7 @@ class User(AbstractUser):
 
     @property
     def is_admin_user(self) -> bool:
-        return self.has_role("Admin") or self.is_super_admin
+        return self.has_role("Admin") or self.is_super_admin or self.is_superuser
 
     @property
     def is_director(self) -> bool:
@@ -37,7 +37,7 @@ class User(AbstractUser):
 
     @property
     def is_sales(self) -> bool:
-        return self.has_role("Sales")
+        return self.roles.filter(name__in=["Sales", "Sales / Account Managers", "Account Manager"]).exists()
 
     @property
     def is_finance(self) -> bool:
@@ -49,4 +49,10 @@ class User(AbstractUser):
 
     @property
     def is_customer(self) -> bool:
-        return self.has_role("Customer")    
+        return self.roles.filter(name__in=[
+            "Customer",
+            "Customer Portal",
+            "Customer Portal (Wholesaler / Retailer)",
+            "Retailer",
+            "Wholesaler",
+        ]).exists()

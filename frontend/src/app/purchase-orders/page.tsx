@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import api from "@/lib/api";
+import { useAuth } from "@/lib/auth-context";
 
 interface PurchaseOrder {
     id: number;
@@ -15,13 +16,15 @@ interface PurchaseOrder {
 }
 
 export default function PurchaseOrdersPage() {
+  const { user } = useAuth();
+  const canViewTotals = !user?.roles.some((role) => role.name === "Warehouse");
   const [orders, setOrders] = useState<PurchaseOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     api
-      .get("/purchase/purchase-orders/")
+      .get("/purchasing/purchase-orders/")
       .then((res) => {
         const data = res.data.results ?? res.data;
         setOrders(Array.isArray(data) ? data : []);
@@ -75,13 +78,13 @@ export default function PurchaseOrdersPage() {
                 <th className="text-left px-4 py-3 font-semibold">Order Date</th>
                 <th className="text-left px-4 py-3 font-semibold">Expected</th>
                 <th className="text-left px-4 py-3 font-semibold">Status</th>
-                <th className="text-right px-4 py-3 font-semibold">Total</th>
+                {canViewTotals && <th className="text-right px-4 py-3 font-semibold">Total</th>}
               </tr>
             </thead>
             <tbody>
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-gray-400">
+                  <td colSpan={canViewTotals ? 6 : 5} className="px-4 py-8 text-center text-gray-400">
                     No purchase orders found
                   </td>
                 </tr>
@@ -103,7 +106,7 @@ export default function PurchaseOrdersPage() {
                         {order.status}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-right">{order.total_amount}</td>
+                    {canViewTotals && <td className="px-4 py-3 text-right">{order.total_amount}</td>}
                   </tr>
                 ))
               )}

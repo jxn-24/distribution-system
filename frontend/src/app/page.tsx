@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 
+const adminLoginUrl = new URL(
+  "/admin/login/",
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+).toString();
+
 export default function HomePage() {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -16,7 +21,6 @@ export default function HomePage() {
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="flex items-center gap-3 cursor-pointer"
           >
-            {/* Logo placeholder — swap for real logo later */}
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-amber-200 to-amber-500 flex items-center justify-center">
               <span className="text-black font-display font-bold text-sm">LS</span>
             </div>
@@ -50,13 +54,13 @@ export default function HomePage() {
               href="/login"
               className="text-sm text-white/90 border border-white/25 px-4 py-2 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
             >
-              Login
+              Staff Login
             </Link>
             <Link
-              href="/signup"
-              className="text-sm bg-amber-400 text-black font-medium px-4 py-2 rounded-full hover:bg-amber-300 transition"
+              href={adminLoginUrl}
+              className="text-sm text-white/70 px-2 py-2 hover:text-amber-400 transition"
             >
-              Sign Up
+              Admin
             </Link>
           </div>
         </div>
@@ -88,12 +92,11 @@ export default function HomePage() {
                 href="/login"
                 className="border border-white/30 text-white px-6 py-3 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
               >
-                Partner login
+                Staff login
               </Link>
             </div>
           </div>
 
-          {/* Abstract product stage — replace with real pack shots later */}
           <div className="relative flex justify-center">
             <div className="w-64 h-64 md:w-80 md:h-80 rounded-[2rem] bg-gradient-to-br from-neutral-900 via-neutral-800 to-black border border-amber-400/30 shadow-2xl shadow-amber-500/10 flex flex-col items-center justify-center text-center p-8">
               <div className="w-16 h-16 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center mb-4">

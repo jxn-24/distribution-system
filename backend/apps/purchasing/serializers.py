@@ -21,6 +21,14 @@ class PurchaseOrderItemSerializer(serializers.ModelSerializer):
             "quantity_ordered", "quantity_received", "unit_cost", "line_total"
         ]
 
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        if request and request.user.is_warehouse:
+            fields.pop("unit_cost", None)
+            fields.pop("line_total", None)
+        return fields
+
 class PurchaseOrderSerializer(serializers.ModelSerializer):
     items = PurchaseOrderItemSerializer(many=True, read_only=True)
     manufacturer_name = serializers.CharField(source="manufacturer.name", read_only=True)
@@ -33,6 +41,14 @@ class PurchaseOrderSerializer(serializers.ModelSerializer):
             "order_date", "expected_date", "status", "notes",
             "created_by", "total_amount", "items", "created_at"
         ]
+
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get("request")
+        if request and request.user.is_warehouse:
+            fields.pop("total_amount", None)
+            fields.pop("notes", None)
+        return fields
 
 class GoodsReceiptItemSerializer(serializers.ModelSerializer):
     product_sku = serializers.CharField(source="product.sku", read_only=True)

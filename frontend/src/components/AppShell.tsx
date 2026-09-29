@@ -25,6 +25,11 @@ const navItems = [
     roles: ["Super Admin", "Admin", "Director", "Warehouse", "Finance"],
   },
   {
+  href: "/record-payment",
+  label: "Record Payment",
+  roles: ["Super Admin", "Admin", "Finance"],
+  },
+  {
     href: "/ready-to-pack",
     label: "Ready to Pack",
     roles: ["Super Admin", "Admin", "Director", "Warehouse"],

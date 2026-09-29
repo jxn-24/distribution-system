@@ -18,6 +18,13 @@ class Customer(models.Model):
         blank=True,
         related_name="customer_profile"
     )
+    account_manager = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="managed_customers",
+    )
     company_name = models.CharField(max_length=200)
     customer_type = models.CharField(max_length=20, choices=CUSTOMER_TYPES, default="RETAILER")
     contact_person = models.CharField(max_length=150, blank=True, null=True)

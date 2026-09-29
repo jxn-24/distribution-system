@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+.venv/
+backend/venv/
+
+# Environment
+.env
+.env.local
+*.env
+
+# Node / Next
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# OS / editor
+.DS_Store
+.vscode/
+*.swp

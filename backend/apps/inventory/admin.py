@@ -15,9 +15,9 @@ class BatchInline(admin.TabularInline):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("sku", "name", "category", "unit", "selling_price", "track_batches", "is_active")
+    list_display = ("sku", "barcode", "name", "category", "unit", "selling_price", "track_batches", "is_active")
     list_filter = ("category", "is_active", "track_batches", "unit")
-    search_fields = ("sku", "name")
+    search_fields = ("sku", "barcode", "name")
     inlines = [BatchInline]
     readonly_fields = ("created_at", "updated_at")
     ffieldsets = (

@@ -29,6 +29,7 @@ class Product(models.Model):
     ]
 
     sku = models.CharField(max_length=50, unique=True, help_text="Unique Stock Keeping Unit")
+    barcode = models.CharField(max_length=100, unique=True, null=True, blank=True)
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     category = models.ForeignKey(

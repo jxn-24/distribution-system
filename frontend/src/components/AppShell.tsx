@@ -40,6 +40,13 @@ const navItems = [
     roles: ["Super Admin", "Admin", "Warehouse", "Sales", "Finance"],
   },
   
+  { href: "/dashboard", label: "Dashboard", roles: ["Super Admin", "Director", "Admin", "Warehouse", "Sales / Account Managers", "Account Manager", "Finance", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/products", label: "Products", roles: ["Super Admin", "Director", "Admin", "Warehouse", "Sales / Account Managers", "Account Manager", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/inventory", label: "Inventory", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales / Account Managers", "Account Manager", "Sales", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/sales-orders", label: "Sales Orders", roles: ["Super Admin", "Admin", "Director", "Sales / Account Managers", "Account Manager", "Sales", "Finance", "Sales Agent", "Customer Portal (Wholesaler / Retailer)", "Customer"] },
+  { href: "/purchase-orders", label: "Purchase Orders", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Finance"] },
+  { href: "/shipments", label: "Shipments", roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales / Account Managers", "Account Manager", "Sales"] },
+  { href: "/warehouse/scan", label: "Scan Stock", roles: ["Super Admin", "Admin", "Warehouse"] },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -72,25 +79,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   );
 
   return (
-    <div className="min-h-screen bg-neutral-100 text-black flex font-body">
-      {/* Sidebar — Luna Soft black / gold */}
-      <aside className="w-64 bg-black text-white flex flex-col border-r border-white/10">
-        <div className="p-5 border-b border-white/10">
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <Image
-              src="/images/Luna_Soft_Essentials_logo.jpeg"
-              alt="Luna Soft Essentials"
-              width={40}
-              height={40}
-              className="h-10 w-10 object-contain"
-            />
+      <div className="min-h-screen bg-neutral-100 text-neutral-950 flex">
+      {/* Sidebar */}
+      <aside className="w-64 bg-neutral-950 text-neutral-100 flex flex-col border-r border-neutral-800">
+        <div className="p-5 border-b border-neutral-800">
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full border border-amber-400/60 bg-amber-400/10 flex items-center justify-center text-amber-300 font-display text-2xl leading-none">
+              ☾
+            </div>
             <div>
-              <p className="font-display font-semibold text-sm tracking-wide text-white">
-                LUNA SOFT
-              </p>
-              <p className="text-[10px] uppercase tracking-[0.15em] text-amber-400">
-                Essentials
-              </p>
+              <p className="font-display font-semibold text-sm tracking-wide">LUNA SOFT</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</p>
             </div>
           </Link>
         </div>
@@ -104,8 +103,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 className={`block px-3 py-2.5 rounded-lg text-sm transition ${
                   active
-                    ? "bg-amber-400 text-black font-medium"
-                    : "text-white/75 hover:bg-white/10 hover:text-white"
+                    ? "bg-amber-400 text-neutral-950 font-semibold"
+                    : "text-neutral-300 hover:bg-neutral-800 hover:text-white"
                 }`}
               >
                 {item.label}
@@ -114,12 +113,14 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-white/10">
-          <p className="text-sm font-medium text-white">{user.username}</p>
-          <p className="text-xs text-amber-400/90 mb-3">{roleNames.join(", ")}</p>
+        <div className="p-4 border-t border-neutral-800">
+          <p className="text-sm font-medium">{user.username}</p>
+          <p className="text-xs text-neutral-400 mb-3">
+            {roleNames.join(", ")}
+          </p>
           <button
             onClick={logout}
-            className="w-full text-sm bg-white/10 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition border border-white/10"
+            className="w-full text-sm border border-neutral-600 text-neutral-200 hover:border-amber-400 hover:text-amber-300 px-3 py-2 rounded-md transition"
           >
             Logout
           </button>

@@ -1,0 +1,47 @@
+:root,
+html[data-theme="light"],
+html[data-theme="dark"] {
+    --primary: #c4a24b;
+    --primary-fg: #171717;
+    --secondary: #171717;
+    --accent: #e0c36d;
+
+    --header-bg: #171717;
+    --header-color: #d8d8d8;
+    --header-branding-color: var(--accent);
+    --header-link-color: #d8d8d8;
+
+    --breadcrumbs-bg: #242424;
+    --breadcrumbs-fg: #c8c8c8;
+    --breadcrumbs-link-fg: #f0f0f0;
+
+    --link-fg: #a98731;
+    --link-hover-color: #6b541d;
+    --link-selected-fg: #c4a24b;
+
+    --button-bg: #242424;
+    --button-fg: #e0e0e0;
+    --button-hover-bg: #3a3a3a;
+    --default-button-bg: #c4a24b;
+    --default-button-hover-bg: #d6b65e;
+}
+
+html[data-theme="dark"] {
+    --link-fg: #e0c36d;
+    --link-hover-color: #f0f0f0;
+}
+
+.module h2,
+.module caption,
+.inline-group h2 {
+    background: #c4a24b;
+    color: #171717;
+}
+
+.module caption a.section,
+.module caption a.section:link,
+.module caption a.section:visited,
+.module caption a.section:hover,
+.module caption a.section:focus {
+    color: #171717;
+}

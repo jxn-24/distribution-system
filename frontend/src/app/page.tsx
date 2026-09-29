@@ -3,6 +3,11 @@
 import Link from "next/link";
 import Image from "next/image";
 
+const adminLoginUrl = new URL(
+  "/admin/login/",
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
+).toString();
+
 export default function HomePage() {
   const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
@@ -53,9 +58,15 @@ export default function HomePage() {
           <div className="flex items-center gap-2 sm:gap-3">
             <Link
               href="/login"
-              className="text-sm bg-amber-400 text-black font-medium px-4 py-2 rounded-full hover:bg-amber-300 transition"
+              className="text-sm text-white/90 border border-white/25 px-4 py-2 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
             >
-              Login
+              Staff Login
+            </Link>
+            <Link
+              href={adminLoginUrl}
+              className="text-sm text-white/70 px-2 py-2 hover:text-amber-400 transition"
+            >
+              Admin
             </Link>
           </div>
         </div>

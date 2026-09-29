@@ -55,7 +55,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -85,6 +85,7 @@ DATABASES = {
 # Better way using DATABASE_URL (recommended)
 import dj_database_url
 DATABASES["default"] = dj_database_url.config(default=os.getenv("DATABASE_URL"))
+DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

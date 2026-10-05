@@ -156,6 +156,36 @@ def release_reservation(
     )
     return True
 
+def allocate_fifo(product, warehouse, quantity):
+    """Return [(batch, qty), ...] oldest batch first. Does not save."""
+    remaining = int(quantity)
+    if remaining <= 0:
+        raise ValidationError("Quantity must be greater than zero.")
+
+    rows = (
+        Inventory.objects.filter(
+            product=product,
+            warehouse=warehouse,
+            quantity_on_hand__gt=0,
+        )
+        .select_related("batch")
+        .order_by("batch__created_at", "id")
+    )
+    plan = []
+    for row in rows:
+        take = min(row.quantity_on_hand, remaining)
+        if take <= 0:
+            continue
+        plan.append((row.batch, take))
+        remaining -= take
+        if remaining == 0:
+            break
+    if remaining > 0:
+        raise ValidationError(
+            f"Not enough stock to ship {quantity} of {product.sku}. Short by {remaining}."
+        )
+    return plan
+
 @transaction.atomic
 def ship_stock(
     *,
@@ -168,18 +198,19 @@ def ship_stock(
     notes=None,
     user=None,
 ):
-    """Ship stock: reduce on-hand and reserved.Used when a shipment is created/confirmed."""
+    """Ship stock from a chosen batch, or oldest batch first if batch is None."""
     if quantity <= 0:
         raise ValidationError("Ship quantity must be positive.")
 
-    invs = list(
-        Inventory.objects.filter(
-            product=product,
-            warehouse=warehouse,
-            batch=batch,
-        )
+    rows = Inventory.objects.select_for_update().filter(
+        product=product,
+        warehouse=warehouse,
     )
-    total_on_hand = sum(i.quantity_on_hand for i in invs)
+    if batch is not None:
+        rows = rows.filter(batch=batch)
+    rows = list(rows.select_related("batch").order_by("batch__created_at", "id"))
+
+    total_on_hand = sum(i.quantity_on_hand for i in rows)
     if quantity > total_on_hand:
         raise ValidationError(
             f"Not enough on-hand stock to ship for {product.sku}. "
@@ -187,27 +218,28 @@ def ship_stock(
         )
 
     remaining = quantity
-    for inv in invs:
+    for inv in rows:
         if inv.quantity_on_hand <= 0:
             continue
         take = min(inv.quantity_on_hand, remaining)
         inv.quantity_on_hand -= take
         inv.quantity_reserved = max(0, inv.quantity_reserved - take)
         inv.save(update_fields=["quantity_on_hand", "quantity_reserved", "updated_at"])
+        StockMovement.objects.create(
+            product=product,
+            batch=inv.batch,
+            warehouse=warehouse,
+            location=inv.location or location,
+            movement_type="SHIP",
+            quantity=take,
+            reference=reference,
+            notes=notes,
+            created_by=user,
+        )
         remaining -= take
         if remaining == 0:
             break
 
-    
-    StockMovement.objects.create(
-        product=product,
-        batch=batch,
-        warehouse=warehouse,
-        location=location,
-        movement_type="SHIP",
-        quantity=quantity,
-        reference=reference,
-        notes=notes,
-        created_by=user,
-    )
+    if remaining > 0:
+        raise ValidationError(f"Could not ship full quantity for {product.sku}.")
     return True

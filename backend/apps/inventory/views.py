@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.exceptions import ValidationError as APIValidationError
 from django.core.exceptions import ValidationError as DjangoValidationError
 from .scan_serializers import StockScanSerializer
-from .scan_services import apply_stock_scan
+from .scan_services import apply_stock_scan, resolve_scan_code
 from apps.users.permissions import (
     RoleAccessPermission,
 )
@@ -88,22 +88,45 @@ class StockScanViewSet(viewsets.ViewSet):
     permission_classes = [RoleAccessPermission]
     role_access = {"read": ADMIN | WAREHOUSE, "write": ADMIN | WAREHOUSE}
 
-    def _get_product(self, code):
+    def _resolve_code(self, code):
+        code = (code or "").strip()
+        if not code:
+            raise NotFound("Provide a barcode, SKU, or batch code.")
+
+        matched_batch = (
+            Batch.objects.select_related("product")
+            .filter(batch_number__iexact=code)
+            .first()
+        )
+        if matched_batch and matched_batch.product.is_active:
+            return matched_batch.product, matched_batch
+
         try:
-            return Product.objects.get(is_active=True, sku__iexact=code)
+            return Product.objects.get(is_active=True, sku__iexact=code), None
         except Product.DoesNotExist:
             try:
-                return Product.objects.get(is_active=True, barcode__iexact=code)
+                return Product.objects.get(is_active=True, barcode__iexact=code), None
             except Product.DoesNotExist as exc:
-                raise NotFound("No active product matches that SKU or barcode.") from exc
+                raise NotFound(
+                    "No active product matches that SKU, barcode, or batch."
+                ) from exc
+
+    def _get_product(self, code):
+        product, _batch = self._resolve_code(code)
+        return product
 
     @action(detail=False, methods=["get"], url_path="product")
     def product(self, request):
         code = request.query_params.get("code", "").strip()
         if not code:
-            return Response({"detail": "Provide a barcode or SKU in 'code'."}, status=status.HTTP_400_BAD_REQUEST)
-        product = self._get_product(code)
-        stock = Inventory.objects.filter(product=product).select_related("warehouse", "location", "batch")
+            return Response(
+                {"detail": "Provide a barcode, SKU, or batch code in 'code'."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        product, matched_batch = self._resolve_code(code)
+        stock = Inventory.objects.filter(product=product).select_related(
+            "warehouse", "location", "batch"
+        )
         return Response({
             "product": {
                 "id": product.id,
@@ -112,6 +135,11 @@ class StockScanViewSet(viewsets.ViewSet):
                 "name": product.name,
                 "track_batches": product.track_batches,
             },
+            "matched_batch": (
+                {"id": matched_batch.id, "batch_number": matched_batch.batch_number}
+                if matched_batch
+                else None
+            ),
             "stock": [{
                 "warehouse_id": row.warehouse_id,
                 "warehouse": row.warehouse.name,
@@ -137,7 +165,8 @@ class StockScanViewSet(viewsets.ViewSet):
         serializer = StockScanSerializer(data=request.data, context={"direction": direction})
         serializer.is_valid(raise_exception=True)
         data = serializer.validated_data
-        product = self._get_product(data["code"])
+        product, matched_batch = self._resolve_code(data["code"])
+        batch = data.get("batch") or matched_batch
         try:
             inventory_rows, movements = apply_stock_scan(
                 product=product,
@@ -145,7 +174,7 @@ class StockScanViewSet(viewsets.ViewSet):
                 quantity=data["quantity"],
                 direction=direction,
                 movement_type=data.get("movement_type"),
-                batch=data.get("batch"),
+                batch=batch,
                 location=data.get("location"),
                 reference=data.get("reference", ""),
                 notes=data.get("notes", ""),

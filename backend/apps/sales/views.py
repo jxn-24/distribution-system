@@ -1,16 +1,30 @@
-from rest_framework import viewsets
 from django.db.models import Q
+from rest_framework import viewsets
+from rest_framework.exceptions import PermissionDenied
+
 from apps.users.permissions import RoleAccessPermission
 from .models import Customer, SalesOrder
 from .serializers import CustomerSerializer, SalesOrderSerializer
 
+
 class CustomerViewSet(viewsets.ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {
-        "read": {"Admin", "Director", "Sales", "Sales / Account Managers", "Account Manager", "Finance", "Customer", "Customer Portal", "Customer Portal (Wholesaler / Retailer)", "Retailer", "Wholesaler"},
+        "read": {
+            "Admin",
+            "Director",
+            "Sales",
+            "Sales / Account Managers",
+            "Account Manager",
+            "Finance",
+            "Customer",
+            "Customer Portal",
+            "Customer Portal (Wholesaler / Retailer)",
+            "Retailer",
+            "Wholesaler",
+        },
         "write": {"Admin", "Sales", "Sales / Account Managers", "Account Manager"},
     }
 
@@ -33,15 +47,36 @@ class CustomerViewSet(viewsets.ModelViewSet):
         else:
             serializer.save()
 
+
 class SalesOrderViewSet(viewsets.ModelViewSet):
     queryset = SalesOrder.objects.all()
     serializer_class = SalesOrderSerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {
-        "read": {"Admin", "Director", "Sales", "Sales / Account Managers", "Account Manager", "Finance", "Sales Agent", "Customer", "Customer Portal", "Customer Portal (Wholesaler / Retailer)", "Retailer", "Wholesaler"},
+        "read": {
+            "Admin",
+            "Director",
+            "Warehouse",
+            "Sales",
+            "Sales / Account Managers",
+            "Account Manager",
+            "Finance",
+            "Sales Agent",
+            "Customer",
+            "Customer Portal",
+            "Customer Portal (Wholesaler / Retailer)",
+            "Retailer",
+            "Wholesaler",
+        },
         "write": {"Admin", "Sales", "Sales / Account Managers", "Account Manager"},
-        "create": {"Sales Agent", "Customer", "Customer Portal", "Customer Portal (Wholesaler / Retailer)", "Retailer", "Wholesaler"},
+        "create": {
+            "Sales Agent",
+            "Customer",
+            "Customer Portal",
+            "Customer Portal (Wholesaler / Retailer)",
+            "Retailer",
+            "Wholesaler",
+        },
     }
 
     def get_queryset(self):
@@ -52,11 +87,13 @@ class SalesOrderViewSet(viewsets.ModelViewSet):
 
         if user.is_super_admin or user.is_admin_user:
             return qs
-        if user.is_director or user.is_finance:
+        if user.is_director or user.is_finance or getattr(user, "is_warehouse", False):
             return qs
         if user.is_sales:
             return qs.filter(
-                Q(customer__account_manager=user) | Q(sales_agent=user) | Q(created_by=user)
+                Q(customer__account_manager=user)
+                | Q(sales_agent=user)
+                | Q(created_by=user)
             ).distinct()
         if user.is_sales_agent:
             return qs.filter(sales_agent=user)
@@ -69,7 +106,6 @@ class SalesOrderViewSet(viewsets.ModelViewSet):
         if user.is_customer:
             customer = Customer.objects.filter(user=user).first()
             if customer is None:
-                from rest_framework.exceptions import PermissionDenied
                 raise PermissionDenied("Your account is not linked to a customer profile.")
             serializer.save(customer=customer, created_by=user)
         elif user.is_sales_agent:

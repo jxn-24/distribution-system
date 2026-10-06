@@ -1,7 +1,5 @@
-import dynamic from "next/dynamic";
-
-const ScanClient = dynamic(() => import("./scan-client"), { ssr: false });
+import ScanLoader from "./scan-loader";
 
 export default function ScanPage() {
-  return <ScanClient />;
+  return <ScanLoader />;
 }

@@ -1,305 +1,191 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
-const adminLoginUrl = new URL(
-  "/admin/login/",
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000/api",
-).toString();
+const products = [
+  {
+    kicker: "Sanitary care",
+    name: "Luna Soft Pads 290mm",
+    file: "/images/LS-PAD-290.jpg",
+    note: "Ultra soft · Leak protection · Breathable comfort",
+  },
+  {
+    kicker: "Sanitary care",
+    name: "Luna Soft Pads 240mm",
+    file: "/images/LS-PAD-240.jpg",
+    note: "Ultra soft · Leak protection · Breathable comfort",
+  },
+  {
+    kicker: "Adult care",
+    name: "Adult Tape Diapers",
+    file: "/images/LS-ADT-L.jpg",
+    note: "Max absorbency · Overnight protection · Secure fit",
+  },
+  {
+    kicker: "Adult care",
+    name: "Adult Pants",
+    file: "/images/LS-ADP-L.jpg",
+    note: "Flexible fit · Discreet comfort · All-day wear",
+  },
+];
+
+const objectives = [
+  ["Quality & Safety", "Reliable, high-quality products that meet customer needs and applicable standards."],
+  ["Customer Satisfaction", "Exceptional service and long-term relationships with customers and partners."],
+  ["Market Growth", "A wider distribution network across Kenya and other African markets."],
+  ["Innovation & Product Development", "Products that respond to changing consumer needs."],
+  ["Operational Excellence", "Best business and industry practices."],
+  ["Sustainable Growth", "A profitable company that creates opportunities for employees, partners, and communities."],
+  ["Social Impact", "Dignity, comfort, and a better everyday life through accessible hygiene products."],
+];
 
 export default function HomePage() {
-  const scrollTo = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [showHero, setShowHero] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowHero(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  function scrollToSection(id: string) {
+    const target = document.getElementById(id);
+    if (!target) return;
+    const start = window.scrollY;
+    const end = target.getBoundingClientRect().top + window.scrollY - 80;
+    const duration = 2000;
+    const begin = performance.now();
+    function step(now: number) {
+      const progress = Math.min((now - begin) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      window.scrollTo(0, start + (end - start) * eased);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
 
   return (
-    <div className="min-h-screen bg-white text-neutral-900 font-body">
-      {/* ===== HEADER ===== */}
-      <header className="sticky top-0 z-50 bg-black/95 backdrop-blur border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <button
-            onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-            className="flex items-center gap-3 cursor-pointer"
-          >
-            <Image
-              src="/images/Luna_Soft_Essentials_logo.jpeg"
-              alt="Luna Soft Essentials"
-              width={56}
-              height={56}
-              className="h-12 w-12 sm:h-14 sm:w-14 object-contain"
-              priority
-            />
-            <div className="text-left">
-              <p className="font-display font-semibold text-white text-sm tracking-wide">
-                LUNA SOFT
-              </p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-400/90">
-                Essentials
-              </p>
-            </div>
-          </button>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm text-white/80">
-            <button onClick={() => scrollTo("story")} className="hover:text-amber-400 transition">
-              Our Story
-            </button>
-            <button onClick={() => scrollTo("products")} className="hover:text-amber-400 transition">
-              Products
-            </button>
-            <button onClick={() => scrollTo("promise")} className="hover:text-amber-400 transition">
-              Promise
-            </button>
-            <button onClick={() => scrollTo("contact")} className="hover:text-amber-400 transition">
-              Contact
-            </button>
+    <main className="bg-neutral-950 font-sans text-white">
+      <header className="sticky top-0 z-20 border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
+        <div className="mx-auto grid max-w-6xl grid-cols-3 items-center px-5 py-4">
+          <Link href="/" className="flex items-center gap-3">
+            <Image src="/images/Luna_Soft_Essentials_logo.jpeg" alt="Luna Soft Essentials" width={48} height={48} className="h-12 w-12 rounded-md object-cover" />
+            <span>
+              <span className="block font-display text-sm font-semibold tracking-wide">LUNA SOFT</span>
+              <span className="block text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</span>
+            </span>
+          </Link>
+          <nav className="flex justify-center gap-8 text-sm font-bold">
+            <button onClick={() => scrollToSection("about")}>About Us</button>
+            <button onClick={() => scrollToSection("products")}>Products</button>
+            <button onClick={() => scrollToSection("contact")}>Contact</button>
           </nav>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link
-              href="/login"
-              className="text-sm text-white/90 border border-white/25 px-4 py-2 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
-            >
-              Staff Login
-            </Link>
-            <Link
-              href={adminLoginUrl}
-              className="text-sm text-white/70 px-2 py-2 hover:text-amber-400 transition"
-            >
-              Admin
-            </Link>
-          </div>
+          <div />
         </div>
       </header>
 
-      {/* ===== HERO ===== */}
-      <section className="bg-black text-white">
-        <div className="max-w-6xl mx-auto px-4 py-20 md:py-28 grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-amber-400 text-xs font-medium tracking-[0.25em] uppercase mb-4">
-              Gentle care. Strong protection.
-            </p>
-            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-semibold leading-[1.1] mb-6">
-              Softness you feel.
-              <span className="block text-amber-400">Confidence you keep.</span>
-            </h1>
-            <p className="text-white/70 text-lg max-w-md mb-8 font-body leading-relaxed">
-              Luna Soft Essentials brings everyday hygiene products designed for
-              comfort, dignity, and reliable protection — for every body, every day.
-            </p>
-            <div className="flex flex-wrap gap-3">
-              <button
-                onClick={() => scrollTo("products")}
-                className="bg-amber-400 text-black font-medium px-6 py-3 rounded-full hover:bg-amber-300 transition"
-              >
-                Explore products
-              </button>
-              <Link
-                href="/login"
-                className="border border-white/30 text-white px-6 py-3 rounded-full hover:border-amber-400 hover:text-amber-400 transition"
-              >
-                Staff login
-              </Link>
-            </div>
-          </div>
-
-          <div className="relative flex justify-center">
-            <div className="w-64 h-64 md:w-80 md:h-80 rounded-[2rem] bg-gradient-to-br from-neutral-900 via-neutral-800 to-black border border-amber-400/30 shadow-2xl shadow-amber-500/10 flex flex-col items-center justify-center text-center p-6 md:p-8">
-              <Image
-                src="/images/Luna_Soft_Essentials_logo.jpeg"
-                alt="Luna Soft Essentials"
-                width={220}
-                height={220}
-                className="h-24 w-24 object-contain mb-4"
-              />
-              <p className="font-display text-2xl text-white tracking-wide">LUNA SOFT</p>
-              <p className="text-amber-400/90 text-xs tracking-[0.2em] uppercase mt-2">
-                Essentials
-              </p>
-              <p className="text-white/50 text-sm mt-4">Sanitary care · Adult care</p>
-            </div>
-          </div>
+      <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-[1.2fr_0.8fr]">
+        <div>
+          <p className="text-xs uppercase tracking-[0.25em] text-amber-300">Quality Care. Everyday Comfort. Trusted Essentials.</p>
+          <h1 className="mt-4 font-display text-5xl font-semibold leading-tight">
+            Softness you feel.<br /><span className="text-amber-300">Confidence you keep.</span>
+          </h1>
+          <p className="mt-6 max-w-xl text-neutral-300">
+            Luna Soft Essentials brings everyday hygiene products designed for comfort, dignity, and reliable protection — for every body, every day.
+          </p>
+        </div>
+        <div className={`mx-auto w-full max-w-xs transition-all duration-700 ${showHero ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
+          <Image src="/images/product-all.jpg" alt="Luna Soft Essentials products" width={640} height={640} className="h-72 w-full rounded-3xl object-contain shadow-[0_0_40px_rgba(251,191,36,0.28)]" priority />
         </div>
       </section>
 
-      {/* ===== STORY ===== */}
-      <section id="story" className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 grid md:grid-cols-12 gap-10">
-          <div className="md:col-span-4">
-            <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-3">Our story</p>
-            <h2 className="font-display text-3xl md:text-4xl font-semibold text-black leading-tight">
-              Built for real life, not the shelf alone.
-            </h2>
+      <section id="about" className="bg-white text-neutral-950">
+        <div className="mx-auto max-w-6xl px-5 py-16">
+          <h2 className="font-display text-3xl font-semibold">About Us</h2>
+          <div className="mt-8 grid gap-6 md:grid-cols-2">
+            <article className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+              <h3 className="font-display text-amber-700">Vision</h3>
+              <p className="mt-3 text-neutral-800">To be a leading and trusted provider of quality essential care and hygiene products across Africa, improving comfort, dignity, health, and everyday well-being.</p>
+            </article>
+            <article className="rounded-2xl border border-neutral-200 bg-neutral-50 p-6">
+              <h3 className="font-display text-amber-700">Mission</h3>
+              <p className="mt-3 text-neutral-800">To provide high-quality, affordable, and reliable personal care, adult care, and hygiene products through efficient distribution, excellent customer service, and trusted partnerships — while creating lasting value for our customers, employees, and communities.</p>
+            </article>
           </div>
-          <div className="md:col-span-8 space-y-4 text-neutral-600 text-lg leading-relaxed">
-            <p>
-              Luna Soft Essentials is a distribution-led brand focused on essential
-              hygiene — from sanitary pads to adult care — with packaging and product
-              quality that feel premium without being distant.
-            </p>
-            <p>
-              We connect manufacturers to markets through careful warehousing,
-              clear inventory, and partners who care about availability and trust.
-            </p>
-          </div>
+          <h3 className="mt-10 font-serif text-xl italic underline">Core objectives</h3>
+          <ol className="mt-4 grid gap-4 md:grid-cols-2">
+            {objectives.map(([title, text], index) => (
+              <li key={title} className="rounded-2xl border border-neutral-300 p-5">
+                <p className="font-serif text-base font-bold italic">{index + 1}. {title}</p>
+                <p className="mt-2 text-sm text-neutral-700">{text}</p>
+              </li>
+            ))}
+          </ol>
         </div>
       </section>
 
-      {/* ===== PRODUCTS ===== */}
-      <section id="products" className="py-20 bg-neutral-50">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-12">
-            <div>
-              <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-3">Range</p>
-              <h2 className="font-display text-3xl md:text-4xl font-semibold text-black">
-                Care that shows up.
-              </h2>
-            </div>
-            <p className="text-neutral-500 max-w-sm text-sm">
-              Bold on the outside. Soft where it matters. Designed for everyday confidence.
-            </p>
+      <section id="products" className="bg-white text-neutral-950">
+        <div className="mx-auto max-w-6xl px-5 py-16">
+          <p className="text-xs uppercase tracking-[0.25em] text-amber-700">Range</p>
+          <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
+            <h2 className="font-display text-4xl font-semibold">Care that shows up.</h2>
+            <p className="max-w-xs text-sm text-neutral-500">Bold on the outside. Soft where it matters. Designed for everyday confidence.</p>
           </div>
-
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Luna Soft Pads",
-                blurb: "Ultra soft · Leak protection · Breathable comfort",
-                tag: "Sanitary care",
-              },
-              {
-                title: "Adult Tape Diapers",
-                blurb: "Max absorbency · Overnight protection · Secure fit",
-                tag: "Adult care",
-              },
-              {
-                title: "Adult Pants",
-                blurb: "Flexible fit · Discreet comfort · All-day wear",
-                tag: "Adult care",
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className="group bg-black text-white rounded-3xl p-6 border border-white/5 hover:border-amber-400/40 transition shadow-lg"
-              >
-                <p className="text-amber-400 text-[10px] tracking-[0.2em] uppercase mb-4">
-                  {item.tag}
-                </p>
-                <div className="h-28 rounded-2xl bg-gradient-to-br from-neutral-800 to-neutral-950 border border-amber-400/20 mb-5 flex items-center justify-center">
-                  <Image
-                    src="/images/Luna_Soft_Essentials_logo.jpeg"
-                    alt=""
-                    width={48}
-                    height={48}
-                    className="h-12 w-12 object-contain opacity-90"
-                  />
+          <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {products.map((product) => (
+              <article key={product.file} className="rounded-3xl bg-neutral-950 p-4 text-white">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-amber-300">{product.kicker}</p>
+                <div className="mt-3 flex h-40 items-center justify-center rounded-2xl border border-amber-400/30">
+                  <Image src={product.file} alt={product.name} width={400} height={300} className="max-h-36 w-full object-contain" />
                 </div>
-                <h3 className="font-display text-xl font-semibold mb-2">{item.title}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">{item.blurb}</p>
-              </div>
+                <h3 className="mt-4 font-display text-lg font-semibold">{product.name}</h3>
+                <p className="mt-2 text-sm text-neutral-400">{product.note}</p>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ===== PROMISE ===== */}
-      <section id="promise" className="py-20 bg-black text-white">
-        <div className="max-w-6xl mx-auto px-4">
-          <p className="text-amber-400 text-xs tracking-[0.2em] uppercase mb-3 text-center">
-            Our promise
-          </p>
-          <h2 className="font-display text-3xl md:text-4xl font-semibold text-center mb-14">
-            Soft on skin. Serious on quality.
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                t: "Comfort first",
-                d: "Materials and fit chosen for all-day wear without compromise.",
-              },
-              {
-                t: "Reliable supply",
-                d: "Distribution systems that keep partners stocked and shelves ready.",
-              },
-              {
-                t: "Clear standards",
-                d: "Batch tracking, expiry awareness, and accountable handling.",
-              },
-            ].map((x) => (
-              <div key={x.t} className="text-center px-4">
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full border border-amber-400/40 flex items-center justify-center text-amber-400">
-                  ✦
-                </div>
-                <h3 className="font-display text-lg font-semibold mb-2">{x.t}</h3>
-                <p className="text-white/60 text-sm leading-relaxed">{x.d}</p>
-              </div>
-            ))}
+      <section id="contact" className="bg-white text-neutral-950">
+        <div className="mx-auto max-w-6xl px-5 py-16 text-center">
+          <p className="text-xs uppercase tracking-[0.25em] text-amber-700">Contact</p>
+          <h2 className="mt-3 font-display text-4xl font-semibold">Let’s work together</h2>
+          <p className="mt-4 text-neutral-600">Wholesalers and retailers — contact our sales team to place orders.</p>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            <article className="rounded-2xl bg-neutral-100 px-6 py-5">
+              <p className="text-amber-700">Location</p>
+              <p className="mt-2 font-medium">Kikuyu, Kenya</p>
+            </article>
+            <article className="rounded-2xl bg-neutral-100 px-6 py-5">
+              <p className="text-amber-700">Email</p>
+              <a className="mt-2 block font-medium" href="mailto:lunasoftlimited@gmail.com?subject=Enquiry%20from%20the%20website">lunasoftlimited@gmail.com</a>
+            </article>
+            <article className="rounded-2xl bg-neutral-100 px-6 py-5">
+              <p className="text-amber-700">Phone</p>
+              <a className="mt-2 block font-medium" href="tel:+254721669664">+254 721 669 664</a>
+            </article>
           </div>
         </div>
       </section>
 
-      {/* ===== CONTACT ===== */}
-      <section id="contact" className="py-20 bg-white">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-amber-600 text-xs tracking-[0.2em] uppercase mb-3">Contact</p>
-          <h2 className="font-display text-3xl font-semibold text-black mb-4">
-            Let’s work together
-          </h2>
-          <p className="text-neutral-600 max-w-lg mx-auto mb-10">
-            Wholesalers and retailers — contact our sales team to place orders.
-            Staff access the distribution system via Login.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-6 max-w-3xl mx-auto text-sm">
-            <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100">
-              <p className="text-amber-600 font-medium mb-1">Location</p>
-              <p className="text-neutral-600">Kikuyu, Kenya</p>
-            </div>
-            <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100">
-              <p className="text-amber-600 font-medium mb-1">Email</p>
-              <p className="text-neutral-600">info@lunasoft.co.ke</p>
-            </div>
-            <div className="p-5 rounded-2xl bg-neutral-50 border border-neutral-100">
-              <p className="text-amber-600 font-medium mb-1">Phone</p>
-              <p className="text-neutral-600">+254 7XX XXX XXX</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== FOOTER ===== */}
-      <footer className="bg-black text-white border-t border-white/10 py-10">
-        <div className="max-w-6xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+      <footer className="border-t border-neutral-800 bg-neutral-950">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-5 py-6">
           <div className="flex items-center gap-3">
-            <Image
-              src="/images/Luna_Soft_Essentials_logo.jpeg"
-              alt="Luna Soft Essentials"
-              width={48}
-              height={48}
-              className="h-12 w-12 object-contain"
-            />
+            <Image src="/images/Luna_Soft_Essentials_logo.jpeg" alt="Luna Soft Essentials" width={42} height={42} className="h-10 w-10 rounded-md object-cover" />
             <div>
-              <p className="font-display font-semibold text-sm">LUNA SOFT ESSENTIALS</p>
-              <p className="text-[10px] text-white/40 tracking-wider">
-                GENTLE CARE. STRONG PROTECTION.
-              </p>
+              <p className="text-sm font-semibold tracking-wide">LUNA SOFT ESSENTIALS</p>
+              <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">Gentle care. Strong protection.</p>
             </div>
           </div>
-          <div className="flex gap-5 text-sm text-white/50">
-            <a href="#" className="hover:text-amber-400 transition">
-              Instagram
-            </a>
-            <a href="#" className="hover:text-amber-400 transition">
-              Facebook
-            </a>
-            <a href="#" className="hover:text-amber-400 transition">
-              TikTok
-            </a>
+          <div className="flex gap-6 text-sm text-neutral-300">
+            <span>Instagram</span>
+            <span>Facebook</span>
+            <span>TikTok</span>
           </div>
-          <p className="text-xs text-white/40">
-            © {new Date().getFullYear()} Luna Soft Essentials. All rights reserved.
-          </p>
+          <p className="text-sm text-neutral-400">© 2026 Luna Soft Essentials. All rights reserved.</p>
         </div>
       </footer>
-    </div>
+    </main>
   );
 }

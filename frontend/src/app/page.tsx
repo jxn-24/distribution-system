@@ -68,31 +68,37 @@ export default function HomePage() {
   return (
     <main className="bg-neutral-950 font-sans text-white">
       <header className="sticky top-0 z-20 border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
-        <div className="mx-auto grid max-w-6xl grid-cols-3 items-center px-5 py-4">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:grid md:grid-cols-3 md:items-center md:px-5 md:py-4">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/images/Luna_Soft_Essentials_logo.jpeg" alt="Luna Soft Essentials" width={48} height={48} className="h-12 w-12 rounded-md object-cover" />
-            <span>
+            <Image
+              src="/images/Luna_Soft_Essentials_logo.jpeg"
+              alt="Luna Soft Essentials Ltd."
+              width={100}
+              height={100}
+              className="h-11 w-11 shrink-0 rounded-md object-cover"
+            />
+            <span className="leading-tight">
               <span className="block font-display text-sm font-semibold tracking-wide">LUNA SOFT</span>
-              <span className="block text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</span>
+              <span className="block text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials Ltd.</span>
             </span>
           </Link>
-          <nav className="flex justify-center gap-8 text-sm font-bold">
+          <nav className="flex justify-start gap-5 text-sm font-bold md:justify-center md:gap-8">
             <button onClick={() => scrollToSection("about")}>About Us</button>
             <button onClick={() => scrollToSection("products")}>Products</button>
             <button onClick={() => scrollToSection("contact")}>Contact</button>
           </nav>
-          <div />
+          <div className="hidden md:block" />
         </div>
       </header>
 
       <section className="mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-[1.2fr_0.8fr]">
         <div>
-          <p className="text-xs uppercase tracking-[0.25em] text-amber-300">Quality Care. Everyday Comfort. Trusted Essentials.</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-amber-300">Gentle Care. Strong Protection</p>
           <h1 className="mt-4 font-display text-5xl font-semibold leading-tight">
             Softness you feel.<br /><span className="text-amber-300">Confidence you keep.</span>
           </h1>
           <p className="mt-6 max-w-xl text-neutral-300">
-            Luna Soft Essentials brings everyday hygiene products designed for comfort, dignity, and reliable protection — for every body, every day.
+            Luna Soft Essentials Ltd. brings everyday hygiene products designed for comfort, dignity, and reliable protection — for every body, every day.
           </p>
         </div>
         <div className={`mx-auto w-full max-w-xs transition-all duration-700 ${showHero ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
@@ -127,11 +133,11 @@ export default function HomePage() {
 
       <section id="products" className="bg-white text-neutral-950">
         <div className="mx-auto max-w-6xl px-5 py-16">
-          <p className="text-xs uppercase tracking-[0.25em] text-amber-700">Range</p>
+          <p className="text-xs uppercase tracking-[0.25em] text-amber-700">PRODUCTS</p>
           <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
             <h2 className="font-display text-4xl font-semibold">Care that shows up.</h2>
-            <p className="max-w-xs text-sm text-neutral-500">Bold on the outside. Soft where it matters. Designed for everyday confidence.</p>
-          </div>
+
+            </div>
           <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {products.map((product) => (
               <article key={product.file} className="rounded-3xl bg-neutral-950 p-4 text-white">

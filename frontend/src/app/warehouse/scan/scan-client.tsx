@@ -28,6 +28,7 @@ interface ScannedProduct {
 }
 interface ScanLookup {
   product: ScannedProduct;
+  matched_batch?: { id: number; batch_number: string } | null;
   stock: StockRow[];
 }
 interface WarehouseOption { id: number; name: string; code: string }
@@ -42,6 +43,7 @@ export default function WarehouseScanPage() {
   const initialMode: Mode = requestedMode === "pick" || requestedMode === "adjust" ? "dispense" : "receive";
   const [mode, setMode] = useState<Mode>(initialMode);
   const [code, setCode] = useState("");
+  const [scannedCode, setScannedCode] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [warehouseId, setWarehouseId] = useState("");
   const [locationId, setLocationId] = useState("");
@@ -88,18 +90,30 @@ export default function WarehouseScanPage() {
     setMessage("");
     setLookup(null);
     setCode(value);
-    setBatchId("");
+    setScannedCode(value);
     try {
       const response = await api.get("/warehouse/scan/product/", { params: { code: value } });
-      setLookup(response.data);
-      setLocationId("");
+      const data = response.data as ScanLookup;
+      setLookup(data);
+      if (data.matched_batch?.id) setBatchId(String(data.matched_batch.id));
+      else setBatchId("");
+
+      const stockRow = data.stock?.find((row) => row.location_id);
+      const warehouseForLocation = stockRow ? String(stockRow.warehouse_id) : warehouseId;
+      const receiving = locations.find((location) =>
+        String(location.warehouse) === warehouseForLocation &&
+        location.name.toLowerCase().includes("receiving")
+      );
+      if (receiving) setLocationId(String(receiving.id));
+      else if (stockRow?.location_id) setLocationId(String(stockRow.location_id));
+      else setLocationId("");
     } catch (requestError: unknown) {
       const responseMessage = (requestError as { response?: { data?: { detail?: string } } }).response?.data?.detail;
       setError(responseMessage || "Product not found. Check the SKU or barcode and try again.");
     } finally {
       setBusy(false);
     }
-  }, []);
+  }, [locations, warehouseId]);
 
   const handleManualLookup = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -108,14 +122,14 @@ export default function WarehouseScanPage() {
 
   const submitMovement = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!lookup || !warehouseId) return;
+    if (!lookup || !warehouseId || !scannedCode) return;
     setBusy(true);
     setError("");
     setMessage("");
     try {
       const endpoint = mode === "receive" ? "receive" : "dispense";
       const response = await api.post(`/warehouse/scan/${endpoint}/`, {
-        code: lookup.product.sku,
+        code: scannedCode,
         quantity,
         warehouse: Number(warehouseId),
         location: locationId ? Number(locationId) : null,
@@ -124,7 +138,7 @@ export default function WarehouseScanPage() {
         movement_type: movementType,
       });
       const counted = response.data.inventory.reduce((total: number, row: { quantity_on_hand: number }) => total + row.quantity_on_hand, 0);
-      await lookupCode(lookup.product.sku);
+      await lookupCode(scannedCode);
       setMessage(`${mode === "receive" ? "Stock received" : "Stock removed"}: ${quantity} ${lookup.product.name}. Warehouse count is now ${counted}.`);
     } catch (requestError: unknown) {
       const responseData = (requestError as { response?: { data?: { detail?: string; quantity?: string[] } } }).response?.data;
@@ -153,14 +167,14 @@ export default function WarehouseScanPage() {
         <header>
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Warehouse operations</p>
           <h1 className="mt-1 text-2xl font-bold text-neutral-950">Scan stock</h1>
-          <p className="mt-1 text-sm text-neutral-600">Scan or enter a SKU to receive stock or fulfil an outbound movement.</p>
+          <p className="mt-1 text-sm text-neutral-600">Scan a package barcode. The arrival lot is selected for you.</p>
         </header>
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
           <section className="space-y-4 rounded-lg border border-neutral-200 bg-white p-4 shadow-sm">
             <div className="grid grid-cols-2 gap-2" role="group" aria-label="Stock action">
               <button type="button" onClick={() => { setMode("receive"); setMovementType("RECEIVE"); }} aria-pressed={mode === "receive"} className={`min-h-12 rounded-md font-semibold ${mode === "receive" ? "bg-neutral-950 text-amber-300" : "bg-neutral-100 text-neutral-700"}`}>Receive stock</button>
-              <button type="button" onClick={() => { setMode("dispense"); setMovementType("PICK"); }} aria-pressed={mode === "dispense"} className={`min-h-12 rounded-md font-semibold ${mode === "dispense" ? "bg-neutral-950 text-amber-300" : "bg-neutral-100 text-neutral-700"}`}>Remove / pick</button>
+              <button type="button" onClick={() => { setMode("dispense"); setMovementType("SHIP"); }} aria-pressed={mode === "dispense"} className={`min-h-12 rounded-md font-semibold ${mode === "dispense" ? "bg-neutral-950 text-amber-300" : "bg-neutral-100 text-neutral-700"}`}>Remove / pick</button>
             </div>
 
             <ScanBarcode onDetected={lookupCode} />
@@ -183,15 +197,15 @@ export default function WarehouseScanPage() {
 
             {lookup && <div className="rounded-md border border-amber-300 bg-amber-50 p-3" aria-live="polite">
               <p className="font-bold text-neutral-950">{lookup.product.name}</p>
-              <p className="text-sm text-neutral-700">SKU {lookup.product.sku}{lookup.product.barcode ? ` · ${lookup.product.barcode}` : ""}</p>
+              <p className="text-sm text-neutral-700">SKU {lookup.product.sku}{lookup.matched_batch ? ` · ${lookup.matched_batch.batch_number}` : ""}</p>
+              <p className="text-sm text-neutral-700">Code {scannedCode}</p>
               <p className="mt-2 text-sm text-neutral-700">Available at selected warehouse</p>
               <p className="text-3xl font-bold tabular-nums text-neutral-950">{availableAtWarehouse}</p>
-              {selectedStock.map((row) => <p key={`${row.warehouse_id}-${row.location_id}-${row.batch_id}`} className="text-xs text-neutral-600">{row.location || "Unassigned location"}{row.batch ? ` · Batch ${row.batch}` : ""}: {row.quantity_on_hand} on hand, {row.quantity_available} available</p>)}
             </div>}
 
             {lookup && <form onSubmit={submitMovement} className="space-y-3">
               <label className="block text-sm font-medium text-neutral-700">Quantity
-                <input type="number" min={1} max={mode === "dispense" ? Math.max(availableAtWarehouse, 1) : undefined} value={quantity} onChange={(event) => setQuantity(Math.max(1, Number(event.target.value)))} className="mt-1 min-h-12 w-full rounded-md border border-neutral-300 px-3 text-lg text-neutral-950" required />
+                <input type="number" min={1} value={quantity} onChange={(event) => setQuantity(Math.max(1, Number(event.target.value)))} className="mt-1 min-h-12 w-full rounded-md border border-neutral-300 px-3 text-lg text-neutral-950" required />
               </label>
               <label className="block text-sm font-medium text-neutral-700">{mode === "receive" ? "Put-away location" : "Pick from location (optional)"}
                 <select value={locationId} onChange={(event) => setLocationId(event.target.value)} className="mt-1 min-h-12 w-full rounded-md border border-neutral-300 bg-white px-3 text-base text-neutral-950">
@@ -213,11 +227,11 @@ export default function WarehouseScanPage() {
               <label className="block text-sm font-medium text-neutral-700">Reference (optional)
                 <input value={reference} onChange={(event) => setReference(event.target.value)} placeholder="Receipt, sales order, or adjustment ID" className="mt-1 min-h-12 w-full rounded-md border border-neutral-300 px-3 text-base text-neutral-950" />
               </label>
-              <button disabled={busy || !warehouseId || (mode === "receive" && !locationId) || (mode === "dispense" && quantity > availableAtWarehouse)} className="min-h-14 w-full rounded-md bg-neutral-950 px-5 text-lg font-bold text-amber-300 disabled:cursor-not-allowed disabled:opacity-40">
+              <button disabled={busy || !warehouseId || (mode === "receive" && !locationId) || !batchId} className="min-h-14 w-full rounded-md bg-neutral-950 px-5 text-lg font-bold text-amber-300 disabled:cursor-not-allowed disabled:opacity-40">
                 {busy ? "Saving movement…" : mode === "receive" ? "Confirm stock received" : "Confirm stock removal"}
               </button>
             </form>}
-            {!lookup && <p className="rounded-md bg-neutral-100 p-4 text-sm text-neutral-600">Scan or enter a product SKU to see stock and record a movement.</p>}
+            {!lookup && <p className="rounded-md bg-neutral-100 p-4 text-sm text-neutral-600">Scan or enter a package barcode to see stock and record a movement.</p>}
           </section>
         </div>
 

@@ -1,22 +1,23 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, ValidationError as APIValidationError
 from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.exceptions import ValidationError as APIValidationError
 from django.core.exceptions import ValidationError as DjangoValidationError
-from .scan_serializers import StockScanSerializer
-from .scan_services import apply_stock_scan, resolve_scan_code
-from apps.users.permissions import (
-    RoleAccessPermission,
-)
+
+from apps.users.permissions import RoleAccessPermission
 from .models import Category, Product, Batch, Warehouse, StockLocation, Inventory, StockMovement
 from .serializers import (
     CategorySerializer, ProductSerializer, BatchSerializer,
     WarehouseSerializer, StockLocationSerializer,
-    InventorySerializer, StockMovementSerializer
+    InventorySerializer, StockMovementSerializer,
 )
-from apps.inventory.scan_services import apply_stock_scan, match_package_code, receive_package_code
+from .scan_serializers import StockScanSerializer
+from .scan_services import (
+    apply_stock_scan,
+    match_package_code,
+    receive_package_code,
+    ship_package_code,
+)
 
 ADMIN = {"Admin"}
 DIRECTORS = {"Director"}
@@ -32,35 +33,34 @@ CATALOG_READERS = ADMIN | DIRECTORS | WAREHOUSE | SALES | AGENTS | CUSTOMERS
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {"read": CATALOG_READERS, "write": ADMIN}
+
 
 class BatchViewSet(viewsets.ModelViewSet):
     queryset = Batch.objects.all().select_related("product")
     serializer_class = BatchSerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE | SALES | AGENTS | CUSTOMERS, "write": ADMIN | WAREHOUSE}
+
 
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().select_related("category").prefetch_related("batches")
     serializer_class = ProductSerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {"read": CATALOG_READERS, "write": ADMIN}
+
 
 class WarehouseViewSet(viewsets.ModelViewSet):
     queryset = Warehouse.objects.all()
     serializer_class = WarehouseSerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {"read": EMPLOYEES, "write": ADMIN}
+
 
 class StockLocationViewSet(viewsets.ModelViewSet):
     queryset = StockLocation.objects.all().select_related("warehouse")
     serializer_class = StockLocationSerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE | CUSTOMERS, "write": ADMIN | WAREHOUSE}
 
@@ -70,17 +70,17 @@ class StockLocationViewSet(viewsets.ModelViewSet):
             return queryset.filter(is_active=True, warehouse__is_active=True)
         return queryset
 
+
 class InventoryViewSet(viewsets.ModelViewSet):
     queryset = Inventory.objects.all().select_related("product", "batch", "warehouse", "location")
     serializer_class = InventorySerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE, "write": ADMIN | WAREHOUSE}
+
 
 class StockMovementViewSet(viewsets.ModelViewSet):
     queryset = StockMovement.objects.all().select_related("product", "batch", "warehouse", "created_by")
     serializer_class = StockMovementSerializer
-
     permission_classes = [RoleAccessPermission]
     role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE, "write": ADMIN | WAREHOUSE}
 
@@ -118,9 +118,7 @@ class StockScanViewSet(viewsets.ViewSet):
             try:
                 return Product.objects.get(is_active=True, barcode__iexact=code), None
             except Product.DoesNotExist as exc:
-                raise NotFound(
-                    "No active product matches that SKU, barcode, or batch."
-                ) from exc
+                raise NotFound("No active product matches that SKU, barcode, or batch.") from exc
 
     def _get_product(self, code):
         product, _batch = self._resolve_code(code)
@@ -135,9 +133,7 @@ class StockScanViewSet(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST,
             )
         product, matched_batch = self._resolve_code(code)
-        stock = Inventory.objects.filter(product=product).select_related(
-            "warehouse", "location", "batch"
-        )
+        stock = Inventory.objects.filter(product=product).select_related("warehouse", "location", "batch")
         return Response({
             "product": {
                 "id": product.id,
@@ -148,8 +144,7 @@ class StockScanViewSet(viewsets.ViewSet):
             },
             "matched_batch": (
                 {"id": matched_batch.id, "batch_number": matched_batch.batch_number}
-                if matched_batch
-                else None
+                if matched_batch else None
             ),
             "stock": [{
                 "warehouse_id": row.warehouse_id,
@@ -184,21 +179,33 @@ class StockScanViewSet(viewsets.ViewSet):
             return Response({
                 "detail": f"Received package {data['code']}",
                 "product": {"id": lot.product_id, "sku": lot.product.sku, "name": lot.product.name},
-                "inventory": [{
-                    "id": inv.id,
-                    "batch_id": lot.id,
-                    "quantity_on_hand": inv.quantity_on_hand,
-                }],
-                "movements": [{
-                    "id": movement.id,
-                    "movement_type": "RECEIVE",
-                    "quantity": 1,
-                }],
+                "inventory": [{"id": inv.id, "batch_id": lot.id, "quantity_on_hand": inv.quantity_on_hand}],
+                "movements": [{"id": movement.id, "movement_type": "RECEIVE", "quantity": 1}],
             })
         return self._apply(request, direction="in")
 
     @action(detail=False, methods=["post"], url_path="dispense")
     def dispense(self, request):
+        serializer = StockScanSerializer(data=request.data, context={"direction": "out"})
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            package_result = ship_package_code(
+                code=data["code"],
+                warehouse=data["warehouse"],
+                user=request.user,
+                reference=data.get("reference", ""),
+            )
+        except DjangoValidationError as exc:
+            raise APIValidationError({"detail": exc.messages[0]}) from exc
+        if package_result is not None:
+            lot, inv, movement = package_result
+            return Response({
+                "detail": f"Shipped package {data['code']}",
+                "product": {"id": lot.product_id, "sku": lot.product.sku, "name": lot.product.name},
+                "inventory": [{"id": inv.id, "batch_id": lot.id, "quantity_on_hand": inv.quantity_on_hand}],
+                "movements": [{"id": movement.id, "movement_type": "SHIP", "quantity": 1}],
+            })
         return self._apply(request, direction="out")
 
     def _apply(self, request, *, direction):

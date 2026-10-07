@@ -97,6 +97,50 @@ def receive_package_code(*, code, warehouse, location=None, user=None, reference
     )
     return lot, inv, movement
 
+@transaction.atomic
+def ship_package_code(*, code, warehouse, user=None, reference=""):
+    raw = (code or "").strip()
+    package = (
+        PackageUnit.objects.select_for_update()
+        .select_related("batch__product")
+        .filter(code=raw)
+        .first()
+    )
+    if package is None:
+        return None
+    if package.status == "SHIPPED":
+        raise ValidationError(f"Package {raw} is already shipped.")
+
+    lot = package.batch
+    inv = (
+        Inventory.objects.select_for_update()
+        .filter(product=lot.product, warehouse=warehouse, batch=lot, quantity_on_hand__gt=0)
+        .order_by("id")
+        .first()
+    )
+    if inv is None or (inv.quantity_on_hand or 0) < 1:
+        raise ValidationError(f"No stock to ship for package {raw}.")
+
+    inv.quantity_on_hand = (inv.quantity_on_hand or 0) - 1
+    inv.quantity_reserved = max(0, (inv.quantity_reserved or 0) - 1)
+    inv.save(update_fields=["quantity_on_hand", "quantity_reserved", "updated_at"])
+
+    package.status = "SHIPPED"
+    package.shipped_at = timezone.now()
+    package.save(update_fields=["status", "shipped_at"])
+
+    movement = StockMovement.objects.create(
+        product=lot.product,
+        batch=lot,
+        warehouse=warehouse,
+        location=inv.location,
+        movement_type="SHIP",
+        quantity=1,
+        reference=reference or raw,
+        notes=f"Package {raw}",
+        created_by=user if getattr(user, "is_authenticated", False) else None,
+    )
+    return lot, inv, movement
 
 @transaction.atomic
 def apply_stock_scan(

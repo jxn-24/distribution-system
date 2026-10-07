@@ -1,7 +1,24 @@
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils import timezone
+from .models import Batch, Inventory, PackageUnit, Product, StockMovement
 
-from .models import Batch, Inventory, Product, StockMovement
+
+def match_package_code(code):
+    raw = (code or "").strip()
+    if not raw.isdigit():
+        return None, None
+    lots = Batch.objects.select_related("product").exclude(scan_code="").exclude(scan_code__isnull=True)
+    match = None
+    suffix = ""
+    for lot in lots:
+        if raw.startswith(lot.scan_code) and raw[len(lot.scan_code):].isdigit():
+            if match is None or len(lot.scan_code) > len(match.scan_code):
+                match = lot
+                suffix = raw[len(lot.scan_code):]
+    if match is None or len(suffix) != 4:
+        return None, None
+    return match, int(suffix)
 
 
 def resolve_scan_code(code: str):
@@ -9,11 +26,15 @@ def resolve_scan_code(code: str):
     if not raw:
         raise ValidationError("Scan code is required.")
 
-    batch = (
-        Batch.objects.select_related("product")
-        .filter(batch_number__iexact=raw)
-        .first()
-    )
+    lot, _sequence = match_package_code(raw)
+    if lot:
+        return lot.product, lot
+
+    batch = Batch.objects.select_related("product").filter(scan_code__iexact=raw).first()
+    if batch:
+        return batch.product, batch
+
+    batch = Batch.objects.select_related("product").filter(batch_number__iexact=raw).first()
     if batch:
         return batch.product, batch
 
@@ -34,12 +55,47 @@ def _get_or_create_inventory(product, warehouse, location, batch):
         warehouse=warehouse,
         location=location,
         batch=batch,
-        defaults={
-            "quantity_on_hand": 0,
-            "quantity_reserved": 0,
-        },
+        defaults={"quantity_on_hand": 0, "quantity_reserved": 0},
     )
     return inv
+
+
+@transaction.atomic
+def receive_package_code(*, code, warehouse, location=None, user=None, reference=""):
+    lot, sequence = match_package_code(code)
+    if lot is None:
+        return None
+
+    existing = PackageUnit.objects.filter(code=code).first()
+    if existing and existing.status == "IN_STOCK":
+        raise ValidationError(f"Package {code} is already in stock.")
+    if existing and existing.status == "SHIPPED":
+        raise ValidationError(f"Package {code} was already shipped.")
+
+    PackageUnit.objects.get_or_create(
+        code=code,
+        defaults={
+            "batch": lot,
+            "sequence": sequence,
+            "status": "IN_STOCK",
+            "received_at": timezone.now(),
+        },
+    )
+    inv = _get_or_create_inventory(lot.product, warehouse, location, lot)
+    inv.quantity_on_hand = (inv.quantity_on_hand or 0) + 1
+    inv.save(update_fields=["quantity_on_hand", "updated_at"])
+    movement = StockMovement.objects.create(
+        product=lot.product,
+        batch=lot,
+        warehouse=warehouse,
+        location=location,
+        movement_type="RECEIVE",
+        quantity=1,
+        reference=reference or code,
+        notes=f"Package {code}",
+        created_by=user if getattr(user, "is_authenticated", False) else None,
+    )
+    return lot, inv, movement
 
 
 @transaction.atomic

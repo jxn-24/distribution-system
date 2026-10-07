@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Category, Product, Batch
-from .models import Warehouse, StockLocation, Inventory, StockMovement
+from .models import Warehouse, StockLocation, Inventory, StockMovement, PackageUnit
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -42,6 +42,12 @@ class BatchAdmin(admin.ModelAdmin):
     list_filter = ("product", "expiry_date")
     search_fields = ("batch_number", "product__sku", "product__name")
     readonly_fields = ("created_at", "updated_at")
+
+@admin.register(PackageUnit)
+class PackageUnitAdmin(admin.ModelAdmin):
+    list_display = ("code", "batch", "sequence", "status", "received_at")
+    search_fields = ("code", "batch__batch_number", "batch__scan_code")
+    list_filter = ("status",)
 
 @admin.register(Warehouse)
 class WarehouseAdmin(admin.ModelAdmin):

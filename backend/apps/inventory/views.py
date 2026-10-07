@@ -16,6 +16,7 @@ from .serializers import (
     WarehouseSerializer, StockLocationSerializer,
     InventorySerializer, StockMovementSerializer
 )
+from apps.inventory.scan_services import apply_stock_scan, match_package_code, receive_package_code
 
 ADMIN = {"Admin"}
 DIRECTORS = {"Director"}
@@ -93,11 +94,21 @@ class StockScanViewSet(viewsets.ViewSet):
         if not code:
             raise NotFound("Provide a barcode, SKU, or batch code.")
 
+        lot, _sequence = match_package_code(code)
+        if lot and lot.product.is_active:
+            return lot.product, lot
+
         matched_batch = (
             Batch.objects.select_related("product")
-            .filter(batch_number__iexact=code)
+            .filter(scan_code__iexact=code)
             .first()
         )
+        if matched_batch is None:
+            matched_batch = (
+                Batch.objects.select_related("product")
+                .filter(batch_number__iexact=code)
+                .first()
+            )
         if matched_batch and matched_batch.product.is_active:
             return matched_batch.product, matched_batch
 
@@ -155,6 +166,35 @@ class StockScanViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=["post"], url_path="receive")
     def receive(self, request):
+        serializer = StockScanSerializer(data=request.data, context={"direction": "in"})
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        try:
+            package_result = receive_package_code(
+                code=data["code"],
+                warehouse=data["warehouse"],
+                location=data.get("location"),
+                user=request.user,
+                reference=data.get("reference", ""),
+            )
+        except DjangoValidationError as exc:
+            raise APIValidationError({"detail": exc.messages[0]}) from exc
+        if package_result is not None:
+            lot, inv, movement = package_result
+            return Response({
+                "detail": f"Received package {data['code']}",
+                "product": {"id": lot.product_id, "sku": lot.product.sku, "name": lot.product.name},
+                "inventory": [{
+                    "id": inv.id,
+                    "batch_id": lot.id,
+                    "quantity_on_hand": inv.quantity_on_hand,
+                }],
+                "movements": [{
+                    "id": movement.id,
+                    "movement_type": "RECEIVE",
+                    "quantity": 1,
+                }],
+            })
         return self._apply(request, direction="in")
 
     @action(detail=False, methods=["post"], url_path="dispense")

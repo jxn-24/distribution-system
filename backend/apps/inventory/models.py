@@ -32,6 +32,13 @@ class Product(models.Model):
     ]
 
     sku = models.CharField(max_length=50, unique=True, help_text="Unique Stock Keeping Unit")
+    numeric_code = models.CharField(
+        max_length=10,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Digits printed on labels, e.g. 290, 240, 301, 302.",
+    )
     barcode = models.CharField(max_length=100, unique=True, null=True, blank=True)
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
@@ -93,10 +100,19 @@ class Batch(models.Model):
         on_delete=models.CASCADE,
         related_name="batches",
     )
-    batch_number = models.CharField(max_length=100)
+    batch_number = models.CharField(
+        max_length=100,
+        help_text="Readable lot, e.g. LS-PAD-290-061026-01.",
+    )
+    scan_code = models.CharField(
+        max_length=20,
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Numeric arrival code on the parent label, e.g. 29006102601.",
+    )
     manufacture_date = models.DateField(null=True, blank=True)
     expiry_date = models.DateField(null=True, blank=True)
-    # Manufacturer / invoice figure. Not sellable stock.
     expected_quantity = models.PositiveIntegerField(
         default=0,
         help_text="Packages on the supplier document. Not the counted stock.",
@@ -129,6 +145,34 @@ class Batch(models.Model):
             delta = self.expiry_date - timezone.now().date()
             return delta.days
         return None
+
+
+class PackageUnit(models.Model):
+    batch = models.ForeignKey(
+        Batch,
+        on_delete=models.CASCADE,
+        related_name="packages",
+    )
+    sequence = models.PositiveIntegerField(help_text="Package number, e.g. 1 for 0001.")
+    code = models.CharField(
+        max_length=30,
+        unique=True,
+        help_text="Barcode value, e.g. 290061026010001.",
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[("IN_STOCK", "In stock"), ("SHIPPED", "Shipped")],
+        default="IN_STOCK",
+    )
+    received_at = models.DateTimeField(null=True, blank=True)
+    shipped_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("batch", "sequence")
+        ordering = ["sequence"]
+
+    def __str__(self):
+        return self.code
 
 
 class Warehouse(models.Model):

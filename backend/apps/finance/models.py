@@ -3,6 +3,7 @@ from django.core.validators import MinValueValidator
 from apps.sales.models import SalesOrder, Customer
 from apps.users.models import User
 from decimal import Decimal
+from django.db.models import Sum
 
 class Invoice(models.Model):
     STATUS_CHOICES = [
@@ -14,6 +15,13 @@ class Invoice(models.Model):
     ]
 
     invoice_number = models.CharField(max_length=50, unique=True)
+    payment_reference = models.CharField(
+    max_length=30,
+    unique=True,
+    blank=True,
+    null=True,
+    help_text="Account number the customer enters on Co-op paybill.",
+    )
     sales_order = models.ForeignKey(
         SalesOrder,
         on_delete=models.PROTECT,
@@ -64,10 +72,17 @@ class Invoice(models.Model):
                 self.customer = self.sales_order.customer
 
         super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        if not self.payment_reference:
+            last = Invoice.objects.order_by("-id").first()
+            next_number = (last.id + 1) if last else 1
+            self.payment_reference = f"LSE-INV-{next_number:05d}"
+        super().save(*args, **kwargs)
 
 class Receipt(models.Model):
     PAYMENT_METHODS = [
         ("CASH", "Cash"),
+        ("PAYBILL", "Co-op paybill"),
         ("BANK_TRANSFER", "Bank Transfer"),
         ("MOBILE_MONEY", "Mobile Money"),
         ("CHEQUE", "Cheque"),
@@ -90,9 +105,14 @@ class Receipt(models.Model):
         decimal_places=2,
         validators=[MinValueValidator(Decimal("0.01"))]
     )
-    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default="BANK_TRANSFER")
+    payment_method = models.CharField(max_length=20, choices=PAYMENT_METHODS, default="PAYBILL")
     payment_date = models.DateField()
-    reference = models.CharField(max_length=100, blank=True, null=True, help_text="Transaction ID or cheque number")
+    reference = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Paybill account reference or bank transaction code",
+    )
     notes = models.TextField(blank=True, null=True)
     received_by = models.ForeignKey(
         User,
@@ -108,3 +128,18 @@ class Receipt(models.Model):
 
     def __str__(self):
         return self.receipt_number
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        invoice = self.invoice
+        paid = invoice.receipts.aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
+        invoice.amount_paid = paid
+        if invoice.total_amount > 0 and paid >= invoice.total_amount:
+            invoice.status = "PAID"
+            order = invoice.sales_order
+            if order.status in {"CONFIRMED", "PAID"}:
+                order.status = "READY_TO_PACK"
+                order.save(update_fields=["status", "updated_at"])
+        elif paid > 0:
+            invoice.status = "PARTIALLY_PAID"
+        invoice.save(update_fields=["amount_paid", "status", "updated_at"])

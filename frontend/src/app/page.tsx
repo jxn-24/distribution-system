@@ -20,13 +20,13 @@ const products = [
   {
     kicker: "Adult care",
     name: "Adult Tape Diapers",
-    file: "/images/LS-ADT-L.jpg",
+    file: "/images/LS-ADT-L(2).png",
     note: "Max absorbency · Overnight protection · Secure fit",
   },
   {
     kicker: "Adult care",
     name: "Adult Pants",
-    file: "/images/LS-ADP-L.jpg",
+    file: "/images/LS-ADP-XL(2).png",
     note: "Flexible fit · Discreet comfort · All-day wear",
   },
 ];
@@ -143,7 +143,7 @@ export default function HomePage() {
               <article key={product.file} className="rounded-3xl bg-neutral-950 p-4 text-white">
                 <p className="text-[11px] uppercase tracking-[0.18em] text-amber-300">{product.kicker}</p>
                 <div className="mt-3 flex h-40 items-center justify-center rounded-2xl border border-amber-400/30">
-                  <Image src={product.file} alt={product.name} width={400} height={300} className="max-h-36 w-full object-contain" />
+                  <Image src={product.file} alt={product.name} width={700} height={300} className="max-h-36 w-full object-contain" />
                 </div>
                 <h3 className="mt-4 font-display text-lg font-semibold">{product.name}</h3>
                 <p className="mt-2 text-sm text-neutral-400">{product.note}</p>

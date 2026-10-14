@@ -3,7 +3,8 @@ from .models import Invoice, Receipt
 
 
 class InvoiceSerializer(serializers.ModelSerializer):
-    customer_name = serializers.CharField(source="customer.name", read_only=True)
+    customer_name = serializers.CharField(source="customer.company_name", read_only=True)
+    payment_reference = serializers.CharField(read_only=True)
     order_number = serializers.CharField(
         source="sales_order.order_number", read_only=True
     )
@@ -16,6 +17,7 @@ class InvoiceSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "invoice_number",
+            "payment_reference",
             "sales_order",
             "order_number",
             "customer",
@@ -32,7 +34,13 @@ class InvoiceSerializer(serializers.ModelSerializer):
             "created_by",
             "created_at",
         ]
-        read_only_fields = ["created_by", "created_at"]
+        read_only_fields = ["created_by", "created_at", "paayment_reference"]
+        extra_kwargs = {
+            "invoice_number": {"required": False},
+            "invoice_date": {"required": False},
+        }
+
+        
 
 
 class ReceiptSerializer(serializers.ModelSerializer):

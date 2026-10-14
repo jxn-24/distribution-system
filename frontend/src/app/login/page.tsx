@@ -51,7 +51,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md text-black">
         <h1 className="text-2xl font-bold text-center mb-2 text-black">
-          Distribution System
+          LUNASOFT ESSENTIALS LTD.
         </h1>
         <p className="text-center text-gray-800 mb-6">
           Sign in to your account

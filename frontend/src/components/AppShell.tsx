@@ -80,6 +80,11 @@ const navItems = [
     ],
   },
   {
+    href: "/invoices",
+    label: "Invoices",
+    roles: ["Super Admin", "Admin", "Director", "Finance"],
+  },
+  {
     href: "/ready-to-pack",
     label: "Ready to Pack",
     roles: ["Super Admin", "Admin", "Warehouse"],

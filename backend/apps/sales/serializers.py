@@ -92,3 +92,8 @@ class SalesOrderSerializer(serializers.ModelSerializer):
             "created_by", "total_amount", "items", "created_at"
         ]
         read_only_fields = ["created_by", "created_at"]
+
+        extra_kwargs = {
+            "order_number": {"required": False},
+            "order_date": {"required": False},
+        }

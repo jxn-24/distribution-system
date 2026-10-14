@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator
 from decimal import Decimal
-from apps.inventory.models import Product, Warehouse, Batch
+from apps.inventory.models import Product, Warehouse, Batch, Inventory
 from apps.users.models import User
 from django.core.exceptions import ValidationError
 
@@ -115,29 +115,33 @@ class SalesOrder(models.Model):
         super().save(*args, **kwargs)
 
         # RESERVE: only when entering CONFIRMED (once)
-        if self.status == "CONFIRMED" and old_status != "CONFIRMED":
+        if old_status == "DRAFT" and self.status == "CONFIRMED":
             from apps.inventory.services import reserve_stock
-
             for item in self.items.all():
-                if item.quantity_reserved >= item.quantity:
-                    continue
-                to_reserve = item.quantity - item.quantity_reserved
-                try:
-                    reserve_stock(
-                        product=item.product,
-                        batch=item.batch,
-                        warehouse=self.warehouse,
-                        quantity=to_reserve,
-                        reference=self.order_number,
-                        user=self.created_by,
+                batch = item.batch
+                if batch is None:
+                    rows = (
+                        Inventory.objects.filter(product=item.product, warehouse=self.warehouse)
+                        .order_by("batch__created_at", "id")
                     )
-                    item.quantity_reserved = item.quantity
-                    item.save(update_fields=["quantity_reserved"])
-                except Exception as e:
-                    raise ValidationError(
-                        f"Could not reserve stock for {item.product.sku}: {e}"
-                    )
+                    chosen = next((row for row in rows if row.quantity_available >= item.quantity), None)
+                    if chosen is None:
+                        raise ValidationError(f"No available stock for {item.product.sku}.")
+                    batch = chosen.batch
+                    item.batch = batch
 
+                reserve_stock(
+                    product=item.product,
+                    warehouse=self.warehouse,
+                    quantity=item.quantity,
+                    batch=batch,
+                    reference=self.order_number,
+                    user=self.created_by,
+                )
+                item.quantity_reserved = item.quantity
+                item.save(update_fields=["quantity_reserved"])
+
+                          
         # RELEASE: only when cancelling an order that still holds reserved stock
         RESERVED_STATUSES = {
             "CONFIRMED",

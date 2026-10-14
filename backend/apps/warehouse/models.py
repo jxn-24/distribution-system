@@ -16,12 +16,12 @@ class Shipment(models.Model):
     sales_order = models.ForeignKey(
         SalesOrder,
         on_delete=models.PROTECT,
-        related_name="shipments"
+        related_name="shipments",
     )
     warehouse = models.ForeignKey(
         Warehouse,
         on_delete=models.PROTECT,
-        related_name="shipments"
+        related_name="shipments",
     )
     carrier = models.CharField(max_length=100, blank=True, null=True)
     tracking_number = models.CharField(max_length=100, blank=True, null=True)
@@ -34,7 +34,7 @@ class Shipment(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="shipments_created"
+        related_name="shipments_created",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -44,6 +44,19 @@ class Shipment(models.Model):
 
     def __str__(self):
         return self.shipment_number
+
+    def save(self, *args, **kwargs):
+        from django.utils import timezone
+
+        if self.status == "DELIVERED" and not self.delivered_at:
+            self.delivered_at = timezone.now()
+        super().save(*args, **kwargs)
+
+        if self.status == "DELIVERED" and self.sales_order_id:
+            order = self.sales_order
+            if order.status != "DELIVERED":
+                order.status = "DELIVERED"
+                order.save(update_fields=["status", "updated_at"])
 
 class ShipmentItem(models.Model):
     shipment = models.ForeignKey(

@@ -16,21 +16,21 @@ class Invoice(models.Model):
 
     invoice_number = models.CharField(max_length=50, unique=True)
     payment_reference = models.CharField(
-    max_length=30,
-    unique=True,
-    blank=True,
-    null=True,
-    help_text="Account number the customer enters on Co-op paybill.",
+        max_length=30,
+        unique=True,
+        blank=True,
+        null=True,
+        help_text="Account number the customer enters on Co-op paybill.",
     )
     sales_order = models.ForeignKey(
         SalesOrder,
         on_delete=models.PROTECT,
-        related_name="invoices"
+        related_name="invoices",
     )
     customer = models.ForeignKey(
         Customer,
         on_delete=models.PROTECT,
-        related_name="invoices"
+        related_name="invoices",
     )
     invoice_date = models.DateField()
     due_date = models.DateField(null=True, blank=True)
@@ -45,7 +45,7 @@ class Invoice(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name="invoices_created"
+        related_name="invoices_created",
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -61,22 +61,23 @@ class Invoice(models.Model):
         return self.total_amount - self.amount_paid
 
     def save(self, *args, **kwargs):
+        if not self.invoice_number:
+            last = Invoice.objects.order_by("-id").first()
+            next_id = (last.id + 1) if last else 1
+            self.invoice_number = f"INV-{next_id:05d}"
 
-        if self.sales_order_id and (
-            self.total_amount is None or self.total_amount == 0
-        ):
+        if self.sales_order_id and (self.total_amount is None or self.total_amount == 0):
             order_total = self.sales_order.total_amount or Decimal("0.00")
             self.subtotal = order_total
             self.total_amount = order_total
             if not self.customer_id and self.sales_order.customer_id:
                 self.customer = self.sales_order.customer
 
-        super().save(*args, **kwargs)
-    def save(self, *args, **kwargs):
         if not self.payment_reference:
             last = Invoice.objects.order_by("-id").first()
             next_number = (last.id + 1) if last else 1
             self.payment_reference = f"LSE-INV-{next_number:05d}"
+
         super().save(*args, **kwargs)
 
 class Receipt(models.Model):

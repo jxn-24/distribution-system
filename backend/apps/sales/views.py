@@ -6,6 +6,7 @@ from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from apps.users.permissions import RoleAccessPermission
 from .models import Customer, SalesOrder, SalesOrderItem
@@ -112,7 +113,7 @@ class SalesOrderViewSet(viewsets.ModelViewSet):
 
 
 @api_view(["GET"])
-@permission_classes([RoleAccessPermission])
+@permission_classes([IsAuthenticated])
 def margin_report(request):
     user = request.user
     if not (user.is_super_admin or user.is_admin_user or user.is_director or user.is_finance):

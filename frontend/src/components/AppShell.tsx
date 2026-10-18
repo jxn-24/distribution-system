@@ -9,49 +9,17 @@ const navItems = [
   {
     href: "/dashboard",
     label: "Dashboard",
-    roles: [
-      "Super Admin",
-      "Director",
-      "Admin",
-      "Warehouse",
-      "Sales / Account Managers",
-      "Account Manager",
-      "Finance",
-      "Sales Agent",
-      "Customer Portal (Wholesaler / Retailer)",
-      "Customer",
-    ],
+    roles: ["Super Admin", "Director", "Admin", "Warehouse", "Sales", "Sales / Account Managers", "Account Manager", "Finance"],
   },
   {
     href: "/products",
     label: "Products",
-    roles: [
-      "Super Admin",
-      "Director",
-      "Admin",
-      "Warehouse",
-      "Sales / Account Managers",
-      "Account Manager",
-      "Sales Agent",
-      "Customer Portal (Wholesaler / Retailer)",
-      "Customer",
-    ],
+    roles: ["Super Admin", "Director", "Admin", "Sales", "Sales / Account Managers", "Account Manager"],
   },
   {
     href: "/inventory",
     label: "Inventory",
-    roles: [
-      "Super Admin",
-      "Admin",
-      "Director",
-      "Warehouse",
-      "Sales / Account Managers",
-      "Account Manager",
-      "Sales",
-      "Sales Agent",
-      "Customer Portal (Wholesaler / Retailer)",
-      "Customer",
-    ],
+    roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales", "Sales / Account Managers", "Account Manager"],
   },
   {
     href: "/warehouse/scan",
@@ -61,23 +29,12 @@ const navItems = [
   {
     href: "/purchase-orders",
     label: "Purchase Orders",
-    roles: ["Super Admin", "Admin", "Director", "Warehouse", "Finance"],
+    roles: ["Super Admin", "Admin", "Director", "Finance"],
   },
   {
     href: "/sales-orders",
     label: "Sales Orders",
-    roles: [
-      "Super Admin",
-      "Admin",
-      "Director",
-      "Sales / Account Managers",
-      "Account Manager",
-      "Sales",
-      "Finance",
-      "Sales Agent",
-      "Customer Portal (Wholesaler / Retailer)",
-      "Customer",
-    ],
+    roles: ["Super Admin", "Admin", "Director", "Sales", "Sales / Account Managers", "Account Manager", "Finance"],
   },
   {
     href: "/invoices",
@@ -90,6 +47,11 @@ const navItems = [
     roles: ["Super Admin", "Admin", "Warehouse"],
   },
   {
+  href: "/reports/margin",
+  label: "Margin",
+  roles: ["Super Admin", "Admin", "Director", "Finance"],
+},
+  {
     href: "/record-payment",
     label: "Record Payment",
     roles: ["Super Admin", "Admin", "Finance"],
@@ -97,15 +59,7 @@ const navItems = [
   {
     href: "/shipments",
     label: "Shipments",
-    roles: [
-      "Super Admin",
-      "Admin",
-      "Director",
-      "Warehouse",
-      "Sales / Account Managers",
-      "Account Manager",
-      "Sales",
-    ],
+    roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales", "Sales / Account Managers", "Account Manager"],
   },
 ];
 
@@ -129,14 +83,12 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   }
 
   const roleNames = user.roles.map((r) => r.name);
+  const isFullAccess = roleNames.includes("Super Admin") || roleNames.includes("Admin");
 
-  const visibleNav = navItems.filter(
-    (item) =>
-      item.roles.includes("all") ||
-      item.roles.some((r) => roleNames.includes(r)) ||
-      roleNames.includes("Super Admin") ||
-      roleNames.includes("Admin")
-  );
+  const visibleNav = navItems.filter((item) => {
+    if (isFullAccess) return true;
+    return item.roles.some((r) => roleNames.includes(r));
+  });
 
   return (
     <div className="min-h-screen bg-neutral-100 text-neutral-950 flex">
@@ -147,12 +99,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
               ☾
             </div>
             <div>
-              <p className="font-display font-semibold text-sm tracking-wide">
-                LUNA SOFT
-              </p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300">
-                Essentials
-              </p>
+              <p className="font-display font-semibold text-sm tracking-wide">LUNA SOFT</p>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</p>
             </div>
           </Link>
         </div>

@@ -171,7 +171,18 @@ class SalesOrder(models.Model):
                     raise ValidationError(
                         f"Could not release reserved stock for {item.product.sku}: {e}"
                     )
+
 class SalesOrderItem(models.Model):
+    PRICE_TYPE_CHOICES = [
+        ("WHOLESALE", "Wholesale"),
+        ("RETAIL", "Retail"),
+    ]
+    UNIT_CHOICES = [
+        ("pcs", "Pieces"),
+        ("polybag", "Polybag"),
+        ("bale", "Bale"),
+    ]
+
     sales_order = models.ForeignKey(
         SalesOrder,
         on_delete=models.CASCADE,
@@ -189,6 +200,21 @@ class SalesOrderItem(models.Model):
         blank=True,
         related_name="so_items"
     )
+    price_type = models.CharField(
+        max_length=20,
+        choices=PRICE_TYPE_CHOICES,
+        default="WHOLESALE",
+    )
+    entered_unit = models.CharField(
+        max_length=20,
+        choices=UNIT_CHOICES,
+        default="pcs",
+        help_text="Unit the salesperson typed. Quantity is stored in pieces.",
+    )
+    entered_quantity = models.PositiveIntegerField(
+        default=0,
+        help_text="Quantity in the entered unit, before conversion.",
+    )
     quantity = models.PositiveIntegerField(validators=[MinValueValidator(1)])
     quantity_reserved = models.PositiveIntegerField(default=0)
     quantity_shipped = models.PositiveIntegerField(default=0)
@@ -196,7 +222,8 @@ class SalesOrderItem(models.Model):
         max_digits=12,
         decimal_places=2,
         default=Decimal("0.00"),
-        validators=[MinValueValidator(Decimal("0.00"))]
+        validators=[MinValueValidator(Decimal("0.00"))],
+        help_text="Price per piece, KES",
     )
 
     class Meta:
@@ -208,7 +235,6 @@ class SalesOrderItem(models.Model):
     @property
     def line_total(self):
         return self.quantity * self.unit_price
-
 
     @property
     def quantity_pending(self):

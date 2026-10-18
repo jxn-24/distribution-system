@@ -48,14 +48,20 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().select_related("category").prefetch_related("batches")
     serializer_class = ProductSerializer
     permission_classes = [RoleAccessPermission]
-    role_access = {"read": CATALOG_READERS, "write": ADMIN}
+    role_access = {
+    "read": {"Admin", "Director", "Warehouse", "Sales", "Sales / Account Managers", "Account Manager", "Finance"},
+    "write": {"Admin"},
+}
 
 
 class WarehouseViewSet(viewsets.ModelViewSet):
     queryset = Warehouse.objects.all()
     serializer_class = WarehouseSerializer
     permission_classes = [RoleAccessPermission]
-    role_access = {"read": EMPLOYEES, "write": ADMIN}
+    role_access = {
+    "read": {"Admin", "Director", "Warehouse", "Sales", "Sales / Account Managers", "Account Manager", "Finance"},
+    "write": {"Admin"},
+}
 
 
 class StockLocationViewSet(viewsets.ModelViewSet):

@@ -24,8 +24,8 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = [
             "id", "sku", "barcode", "name", "description", "category", "category_name",
-            "unit", "cost_price", "selling_price", "track_batches",
-            "min_stock_level", "is_active", "image", "batches"
+            "unit", "cost_price", "selling_price", "wholesale_price", "retail_price",
+            "track_batches", "min_stock_level", "is_active", "image", "batches",
         ]
 
     def get_fields(self):
@@ -36,6 +36,7 @@ class ProductSerializer(serializers.ModelSerializer):
                 fields.pop(field_name, None)
         if request and (request.user.is_warehouse or request.user.is_customer):
             fields.pop("selling_price", None)
+            fields.pop("cost_price", None)
         if request and not (request.user.is_admin_user or request.user.is_director or request.user.is_finance):
             fields.pop("cost_price", None)
         return fields

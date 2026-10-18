@@ -31,10 +31,39 @@ class SalesOrderItemSerializer(serializers.ModelSerializer):
         model = SalesOrderItem
         fields = [
             "id", "product", "product_sku", "product_name", "batch",
+            "price_type", "entered_unit", "entered_quantity",
             "quantity", "quantity_reserved", "quantity_shipped",
-            "unit_price", "line_total"
+            "unit_price", "line_total",
         ]
-        read_only_fields = ["quantity_reserved", "quantity_shipped", "line_total"]
+        read_only_fields = ["quantity", "quantity_reserved", "quantity_shipped", "line_total"]
+
+    def to_pieces(self, sku, qty, unit):
+        unit = (unit or "pcs").lower()
+        if unit in ("pcs", "piece", "pieces"):
+            return qty
+        if "pad" in (sku or "").lower():
+            if unit == "bale":
+                return qty * 50
+            if unit == "polybag":
+                return qty * 10
+        else:
+            if unit == "bale":
+                return qty * 10
+        return qty
+
+    def validate(self, attrs):
+        product = attrs.get("product") or getattr(self.instance, "product", None)
+        price_type = attrs.get("price_type") or getattr(self.instance, "price_type", "WHOLESALE")
+        entered_unit = attrs.get("entered_unit") or getattr(self.instance, "entered_unit", "pcs")
+        entered_qty = attrs.get("entered_quantity") or getattr(self.instance, "entered_quantity", 0)
+
+        if product and entered_qty:
+            attrs["quantity"] = self.to_pieces(product.sku, entered_qty, entered_unit)
+            if price_type == "RETAIL":
+                attrs["unit_price"] = product.retail_price
+            else:
+                attrs["unit_price"] = product.wholesale_price
+        return attrs
 
     def get_fields(self):
         fields = super().get_fields()
@@ -74,15 +103,21 @@ class SalesOrderSerializer(serializers.ModelSerializer):
             f"SO-{timezone.localdate():%Y%m%d}-{uuid4().hex[:8].upper()}",
         )
         validated_data.setdefault("order_date", timezone.localdate())
-        request = self.context.get("request")
-        is_customer_order = request and (request.user.is_customer or request.user.is_sales_agent)
         order = SalesOrder.objects.create(**validated_data)
         for item_data in items_data:
-            product = item_data["product"]
-            if is_customer_order:
-                item_data["unit_price"] = product.selling_price
             SalesOrderItem.objects.create(sales_order=order, **item_data)
         return order
+
+    def update(self, instance, validated_data):
+        items_data = validated_data.pop("items", None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if items_data is not None:
+            instance.items.all().delete()
+            for item_data in items_data:
+                SalesOrderItem.objects.create(sales_order=instance, **item_data)
+        return instance
 
     class Meta:
         model = SalesOrder
@@ -92,7 +127,6 @@ class SalesOrderSerializer(serializers.ModelSerializer):
             "created_by", "total_amount", "items", "created_at"
         ]
         read_only_fields = ["created_by", "created_at"]
-
         extra_kwargs = {
             "order_number": {"required": False},
             "order_date": {"required": False},

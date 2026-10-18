@@ -17,12 +17,12 @@ interface Option {
   name?: string;
   company_name?: string;
   sku?: string;
-  selling_price?: string;
+  wholesale_price?: string;
+  retail_price?: string;
 }
 
 export default function SalesOrdersPage() {
   const [orders, setOrders] = useState<SalesOrder[]>([]);
-  const [customers, setCustomers] = useState<Option[]>([]);
   const [warehouses, setWarehouses] = useState<Option[]>([]);
   const [products, setProducts] = useState<Option[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,25 +30,25 @@ export default function SalesOrdersPage() {
   const [message, setMessage] = useState("");
   const [busy, setBusy] = useState(false);
 
-  const [customer, setCustomer] = useState("");
+  const [customerName, setCustomerName] = useState("");
+  const [phone, setPhone] = useState("");
   const [warehouse, setWarehouse] = useState("");
   const [product, setProduct] = useState("");
-  const [quantity, setQuantity] = useState(1);
-  const [unitPrice, setUnitPrice] = useState("");
+  const [priceType, setPriceType] = useState("WHOLESALE");
+  const [enteredUnit, setEnteredUnit] = useState("bale");
+  const [enteredQuantity, setEnteredQuantity] = useState(1);
   const [notes, setNotes] = useState("");
 
   const load = () => {
     setLoading(true);
     Promise.all([
       api.get("/sales/sales-orders/"),
-      api.get("/sales/customers/"),
       api.get("/inventory/warehouses/"),
       api.get("/inventory/products/"),
     ])
-      .then(([ordersRes, customersRes, warehousesRes, productsRes]) => {
+      .then(([ordersRes, warehousesRes, productsRes]) => {
         const rows = ordersRes.data.results ?? ordersRes.data;
         setOrders(Array.isArray(rows) ? rows : []);
-        setCustomers(customersRes.data.results ?? customersRes.data);
         setWarehouses(warehousesRes.data.results ?? warehousesRes.data);
         setProducts(productsRes.data.results ?? productsRes.data);
       })
@@ -60,11 +60,9 @@ export default function SalesOrdersPage() {
     load();
   }, []);
 
-  const onProduct = (id: string) => {
-    setProduct(id);
-    const match = products.find((item) => String(item.id) === id);
-    if (match?.selling_price) setUnitPrice(match.selling_price);
-  };
+  const selected = products.find((item) => String(item.id) === product);
+  const unitPrice =
+    priceType === "RETAIL" ? selected?.retail_price : selected?.wholesale_price;
 
   const createOrder = async (event: FormEvent) => {
     event.preventDefault();
@@ -72,30 +70,36 @@ export default function SalesOrdersPage() {
     setError("");
     setMessage("");
     try {
+      const customerRes = await api.post("/sales/customers/", {
+        company_name: customerName,
+        phone,
+      });
+      const customerId = customerRes.data.id;
+
       const res = await api.post("/sales/sales-orders/", {
-        customer: Number(customer),
+        customer: customerId,
         warehouse: Number(warehouse),
         notes,
         items: [
           {
             product: Number(product),
-            quantity: Number(quantity),
-            unit_price: unitPrice,
+            price_type: priceType,
+            entered_unit: enteredUnit,
+            entered_quantity: Number(enteredQuantity),
           },
         ],
       });
-      setMessage(`Draft saved: ${res.data.order_number}`);
-      setQuantity(1);
+      setMessage(`Draft saved: ${res.data.order_number} for ${customerName}`);
+      setCustomerName("");
+      setPhone("");
+      setEnteredQuantity(1);
       setNotes("");
       load();
     } catch (err: any) {
       const detail = err?.response?.data;
       setError(
-        typeof detail === "string"
-        ? detail
-        : JSON.stringify(detail) || "Could not save the order."
+        typeof detail === "string" ? detail : JSON.stringify(detail) || "Could not save the order."
       );
-    
     } finally {
       setBusy(false);
     }
@@ -141,22 +145,33 @@ export default function SalesOrdersPage() {
     <AppShell>
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-neutral-950">Sales Orders</h1>
-        <p className="text-sm text-neutral-600">Create a draft, then confirm it to reserve stock.</p>
+        <p className="text-sm text-neutral-600">
+          Type the customer name and phone. Choose wholesale or retail. Enter bales or polybags.
+        </p>
       </div>
 
       <form onSubmit={createOrder} className="mb-6 grid gap-3 rounded-xl bg-white p-4 shadow md:grid-cols-2">
         <label className="text-sm font-medium text-neutral-800">
-          Customer
-          <select value={customer} onChange={(event) => setCustomer(event.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950">
-            <option value="">Select a customer</option>
-            {customers.map((item) => (
-              <option key={item.id} value={item.id}>{item.company_name}</option>
-            ))}
-          </select>
+          Customer name
+          <input
+            value={customerName}
+            onChange={(e) => setCustomerName(e.target.value)}
+            required
+            className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950"
+          />
+        </label>
+        <label className="text-sm font-medium text-neutral-800">
+          Phone
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            required
+            className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950"
+          />
         </label>
         <label className="text-sm font-medium text-neutral-800">
           Warehouse
-          <select value={warehouse} onChange={(event) => setWarehouse(event.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950">
+          <select value={warehouse} onChange={(e) => setWarehouse(e.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950">
             <option value="">Select a warehouse</option>
             {warehouses.map((item) => (
               <option key={item.id} value={item.id}>{item.name}</option>
@@ -165,7 +180,7 @@ export default function SalesOrdersPage() {
         </label>
         <label className="text-sm font-medium text-neutral-800">
           Product
-          <select value={product} onChange={(event) => onProduct(event.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950">
+          <select value={product} onChange={(e) => setProduct(e.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950">
             <option value="">Select a product</option>
             {products.map((item) => (
               <option key={item.id} value={item.id}>{item.sku} — {item.name}</option>
@@ -173,16 +188,31 @@ export default function SalesOrdersPage() {
           </select>
         </label>
         <label className="text-sm font-medium text-neutral-800">
-          Quantity in packages
-          <input type="number" min={1} value={quantity} onChange={(event) => setQuantity(Number(event.target.value))} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
+          Price type
+          <select value={priceType} onChange={(e) => setPriceType(e.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950">
+            <option value="WHOLESALE">Wholesale</option>
+            <option value="RETAIL">Retail</option>
+          </select>
         </label>
         <label className="text-sm font-medium text-neutral-800">
-          Unit price, KES
-          <input value={unitPrice} onChange={(event) => setUnitPrice(event.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
+          Unit
+          <select value={enteredUnit} onChange={(e) => setEnteredUnit(e.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950">
+            <option value="bale">Bale</option>
+            <option value="polybag">Polybag</option>
+            <option value="pcs">Pieces</option>
+          </select>
         </label>
         <label className="text-sm font-medium text-neutral-800">
+          Quantity
+          <input type="number" min={1} value={enteredQuantity} onChange={(e) => setEnteredQuantity(Number(e.target.value))} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
+        </label>
+        <label className="text-sm font-medium text-neutral-800">
+          Unit price per piece, KES
+          <input value={unitPrice || ""} readOnly className="mt-1 min-h-11 w-full rounded-md border border-neutral-200 bg-neutral-50 px-3 text-neutral-700" />
+        </label>
+        <label className="text-sm font-medium text-neutral-800 md:col-span-2">
           Notes
-          <input value={notes} onChange={(event) => setNotes(event.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
+          <input value={notes} onChange={(e) => setNotes(e.target.value)} className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
         </label>
         <button disabled={busy} className="min-h-11 rounded-md bg-neutral-950 px-4 font-semibold text-amber-300 disabled:opacity-40 md:col-span-2">
           {busy ? "Saving…" : "Save draft"}

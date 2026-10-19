@@ -114,9 +114,11 @@ class SalesOrder(models.Model):
 
         super().save(*args, **kwargs)
 
-        # RESERVE: only when entering CONFIRMED (once)
+        # RESERVE: only when moving from DRAFT to CONFIRMED
         if old_status == "DRAFT" and self.status == "CONFIRMED":
             from apps.inventory.services import reserve_stock
+            from apps.inventory.models import Inventory
+
             for item in self.items.all():
                 batch = item.batch
                 if batch is None:
@@ -139,10 +141,9 @@ class SalesOrder(models.Model):
                     user=self.created_by,
                 )
                 item.quantity_reserved = item.quantity
-                item.save(update_fields=["quantity_reserved"])
+                item.save(update_fields=["batch", "quantity_reserved"])
 
-                          
-        # RELEASE: only when cancelling an order that still holds reserved stock
+        # RELEASE: when cancelling an order that still holds reserved stock
         RESERVED_STATUSES = {
             "CONFIRMED",
             "PAID",
@@ -156,22 +157,18 @@ class SalesOrder(models.Model):
             for item in self.items.all():
                 if item.quantity_reserved <= 0:
                     continue
-                try:
-                    release_reservation(
-                        product=item.product,
-                        batch=item.batch,
-                        warehouse=self.warehouse,
-                        quantity=item.quantity_reserved,
-                        reference=self.order_number,
-                        user=self.created_by,
-                    )
-                    item.quantity_reserved = 0
-                    item.save(update_fields=["quantity_reserved"])
-                except Exception as e:
-                    raise ValidationError(
-                        f"Could not release reserved stock for {item.product.sku}: {e}"
-                    )
+                release_reservation(
+                    product=item.product,
+                    batch=item.batch,
+                    warehouse=self.warehouse,
+                    quantity=item.quantity_reserved,
+                    reference=self.order_number,
+                    user=self.created_by,
+                )
+                item.quantity_reserved = 0
+                item.save(update_fields=["quantity_reserved"])
 
+                
 class SalesOrderItem(models.Model):
     PRICE_TYPE_CHOICES = [
         ("WHOLESALE", "Wholesale"),

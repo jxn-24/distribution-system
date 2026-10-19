@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import api from "@/lib/api";
 
@@ -101,7 +102,11 @@ export default function ShipmentsPage() {
               ) : (
                 shipments.map((shipment) => (
                   <tr key={shipment.id} className="border-b">
-                    <td className="px-4 py-3 font-medium">{shipment.shipment_number}</td>
+                    <td className="px-4 py-3 font-medium">
+                      <Link href={`/shipments/${shipment.id}`} className="text-blue-700 hover:underline">
+                        {shipment.shipment_number}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">{shipment.order_number || "—"}</td>
                     <td className="px-4 py-3">{shipment.warehouse_code || "—"}</td>
                     <td className="px-4 py-3">{shipment.carrier || "—"}</td>

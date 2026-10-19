@@ -131,7 +131,16 @@ class Receipt(models.Model):
         return self.receipt_number
 
     def save(self, *args, **kwargs):
+        if not self.receipt_number:
+            last = Receipt.objects.order_by("-id").first()
+            next_number = (last.id + 1) if last else 1
+            self.receipt_number = f"RCP-{next_number:05d}"
+
+        if self.invoice_id and not self.customer_id:
+            self.customer = self.invoice.customer
+
         super().save(*args, **kwargs)
+
         invoice = self.invoice
         paid = invoice.receipts.aggregate(total=Sum("amount"))["total"] or Decimal("0.00")
         invoice.amount_paid = paid

@@ -56,13 +56,16 @@ class SalesOrderItemSerializer(serializers.ModelSerializer):
         price_type = attrs.get("price_type") or getattr(self.instance, "price_type", "WHOLESALE")
         entered_unit = attrs.get("entered_unit") or getattr(self.instance, "entered_unit", "pcs")
         entered_qty = attrs.get("entered_quantity") or getattr(self.instance, "entered_quantity", 0)
+        override = attrs.get("unit_price")
 
         if product and entered_qty:
             attrs["quantity"] = self.to_pieces(product.sku, entered_qty, entered_unit)
-            if price_type == "RETAIL":
-                attrs["unit_price"] = product.retail_price
-            else:
-                attrs["unit_price"] = product.wholesale_price
+            if override is None or override == 0:
+                if price_type == "RETAIL":
+                    attrs["unit_price"] = product.retail_price
+                else:
+                    attrs["unit_price"] = product.wholesale_price
+            # else keep the bargained unit_price that was sent
         return attrs
 
     def get_fields(self):
@@ -72,6 +75,7 @@ class SalesOrderItemSerializer(serializers.ModelSerializer):
             fields["unit_price"].read_only = True
         return fields
 
+    
 class SalesOrderSerializer(serializers.ModelSerializer):
     items = SalesOrderItemSerializer(many=True, required=False)
     customer_name = serializers.CharField(source="customer.company_name", read_only=True)

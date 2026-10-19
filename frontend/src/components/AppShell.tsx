@@ -57,6 +57,11 @@ const navItems = [
     roles: ["Super Admin", "Admin", "Finance"],
   },
   {
+    href: "/receipts",
+    label: "Receipts",
+    roles: ["Super Admin", "Admin", "Director", "Finance", "Sales"],
+  },
+  {
     href: "/shipments",
     label: "Shipments",
     roles: ["Super Admin", "Admin", "Director", "Warehouse", "Sales", "Sales / Account Managers", "Account Manager"],

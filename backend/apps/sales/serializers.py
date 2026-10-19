@@ -126,7 +126,7 @@ class SalesOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = SalesOrder
         fields = [
-            "id", "order_number", "customer", "customer_name", "sales_agent",
+            "id", "order_number", "customer", "customer_name", "sales_agent", "sales_person_name",
             "order_date", "status", "warehouse", "notes",
             "created_by", "total_amount", "items", "created_at"
         ]

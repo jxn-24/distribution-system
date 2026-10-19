@@ -74,6 +74,12 @@ class SalesOrder(models.Model):
         related_name="agent_orders",
         help_text="Optional sales agent who closed the deal",
     )
+    sales_person_name = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+        help_text="Name of the person who closed or took the order (free text)",
+    )
     order_date = models.DateField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="DRAFT")
     warehouse = models.ForeignKey(

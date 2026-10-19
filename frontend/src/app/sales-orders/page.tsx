@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
+import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import api from "@/lib/api";
 
@@ -8,6 +9,7 @@ interface SalesOrder {
   id: number;
   order_number: string;
   customer_name: string;
+  sales_person_name?: string | null;
   order_date: string;
   status: string;
   total_amount: number;
@@ -47,6 +49,7 @@ export default function SalesOrdersPage() {
 
   const [customerName, setCustomerName] = useState("");
   const [phone, setPhone] = useState("");
+  const [salesPerson, setSalesPerson] = useState("");
   const [warehouse, setWarehouse] = useState("");
   const [notes, setNotes] = useState("");
   const [lines, setLines] = useState<Line[]>([emptyLine()]);
@@ -125,12 +128,14 @@ export default function SalesOrdersPage() {
       const res = await api.post("/sales/sales-orders/", {
         customer: customerId,
         warehouse: Number(warehouse),
+        sales_person_name: salesPerson,
         notes,
         items,
       });
       setMessage(`Draft saved: ${res.data.order_number} for ${customerName}`);
       setCustomerName("");
       setPhone("");
+      setSalesPerson("");
       setNotes("");
       setLines([emptyLine()]);
       load();
@@ -158,6 +163,7 @@ export default function SalesOrdersPage() {
       setBusy(false);
     }
   };
+
   const cancelOrder = async (order: SalesOrder) => {
     if (!confirm(`Cancel ${order.order_number}? It will stay on the list as cancelled.`)) return;
     setBusy(true);
@@ -173,7 +179,6 @@ export default function SalesOrdersPage() {
       setBusy(false);
     }
   };
-  
 
   const statusColor = (status: string) => {
     switch (status) {
@@ -201,12 +206,12 @@ export default function SalesOrdersPage() {
       <div className="mb-6">
         <h1 className="text-2xl font-bold text-neutral-950">Sales Orders</h1>
         <p className="text-sm text-neutral-600">
-          Type the customer. Add one line per product. Leave override blank to use the list price.
+          Type the customer and the sales person. Add one line per product. Leave override blank to use the list price.
         </p>
       </div>
 
       <form onSubmit={createOrder} className="mb-6 space-y-4 rounded-xl bg-white p-4 shadow">
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 md:grid-cols-4">
           <label className="text-sm font-medium text-neutral-800">
             Customer name
             <input value={customerName} onChange={(e) => setCustomerName(e.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
@@ -214,6 +219,10 @@ export default function SalesOrdersPage() {
           <label className="text-sm font-medium text-neutral-800">
             Phone
             <input value={phone} onChange={(e) => setPhone(e.target.value)} required className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
+          </label>
+          <label className="text-sm font-medium text-neutral-800">
+            Sales person
+            <input value={salesPerson} onChange={(e) => setSalesPerson(e.target.value)} placeholder="Name of who took the order" className="mt-1 min-h-11 w-full rounded-md border border-neutral-300 px-3 text-neutral-950" />
           </label>
           <label className="text-sm font-medium text-neutral-800">
             Warehouse
@@ -308,6 +317,7 @@ export default function SalesOrdersPage() {
               <tr>
                 <th className="px-4 py-3 text-left font-semibold">Order #</th>
                 <th className="px-4 py-3 text-left font-semibold">Customer</th>
+                <th className="px-4 py-3 text-left font-semibold">Sales person</th>
                 <th className="px-4 py-3 text-left font-semibold">Date</th>
                 <th className="px-4 py-3 text-left font-semibold">Status</th>
                 <th className="px-4 py-3 text-right font-semibold">Total</th>
@@ -317,13 +327,18 @@ export default function SalesOrdersPage() {
             <tbody>
               {orders.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-neutral-400">No sales orders found</td>
+                  <td colSpan={7} className="px-4 py-8 text-center text-neutral-400">No sales orders found</td>
                 </tr>
               ) : (
                 orders.map((order) => (
                   <tr key={order.id} className="border-b">
-                    <td className="px-4 py-3 font-medium">{order.order_number}</td>
+                    <td className="px-4 py-3 font-medium">
+                      <Link href={`/sales-orders/${order.id}`} className="text-blue-700 hover:underline">
+                        {order.order_number}
+                      </Link>
+                    </td>
                     <td className="px-4 py-3">{order.customer_name || "—"}</td>
+                    <td className="px-4 py-3">{order.sales_person_name || "—"}</td>
                     <td className="px-4 py-3">{order.order_date}</td>
                     <td className="px-4 py-3">
                       <span className={`rounded px-2 py-1 text-xs font-medium ${statusColor(order.status)}`}>{order.status}</span>
@@ -337,14 +352,13 @@ export default function SalesOrdersPage() {
                       )}
                       {(order.status === "DRAFT" || order.status === "CONFIRMED") && (
                         <button
-                        disabled={busy}
-                        onClick={() => cancelOrder(order)}
-                        className="ml-2 rounded border border-red-300 px-3 py-2 text-xs font-semibold text-red-700 disabled:opacity-40">
+                          disabled={busy}
+                          onClick={() => cancelOrder(order)}
+                          className="ml-2 rounded border border-red-300 px-3 py-2 text-xs font-semibold text-red-700 disabled:opacity-40"
+                        >
                           Cancel
                         </button>
                       )}
-  
-
                     </td>
                   </tr>
                 ))

@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import axios from "axios";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 
@@ -13,7 +16,6 @@ export default function LoginPage() {
   const { login, user, isLoading } = useAuth();
   const router = useRouter();
 
-  // Correct way to redirect if already logged in
   useEffect(() => {
     if (!isLoading && user) {
       router.push("/dashboard");
@@ -27,77 +29,89 @@ export default function LoginPage() {
 
     try {
       await login(username, password);
-    } catch (err: any) {
-      setError(
-        err.response?.data?.non_field_errors?.[0] ||
-        err.response?.data?.detail ||
-        "Invalid username or password"
-      );
+    } catch (err: unknown) {
+      const data = axios.isAxiosError(err) ? err.response?.data : undefined;
+      setError(data?.non_field_errors?.[0] || data?.detail || "Invalid username or password");
     } finally {
       setLoading(false);
     }
   };
 
-  // Show nothing while checking auth or redirecting
   if (isLoading || user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
+      <div className="lg-page flex items-center justify-center">
+        <p className="lg-muted">Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-xl shadow-md w-full max-w-md text-black">
-        <h1 className="text-2xl font-bold text-center mb-2 text-black">
-          LUNASOFT ESSENTIALS LTD.
-        </h1>
-        <p className="text-center text-gray-800 mb-6">
-          Sign in to your account
-        </p>
+    <div className="lg-page flex items-center justify-center px-4 py-10">
+      <div className="lg-rise w-full max-w-md">
+        <Link href="/" className="lg-focus mb-6 flex items-center justify-center gap-3 rounded-full">
+          <Image
+            src="/images/Luna_Soft_Essentials_logo.jpeg"
+            alt="Luna Soft Essentials"
+            width={64}
+            height={64}
+            className="h-14 w-14 rounded-2xl object-cover ring-1 ring-gold/50"
+          />
+          <span className="leading-tight">
+            <span className="block font-display text-lg font-semibold tracking-wide">LUNA SOFT</span>
+            <span className="block text-[10px] uppercase tracking-[0.2em] text-gold">Essentials Ltd.</span>
+          </span>
+        </Link>
 
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded mb-4 text-sm">
-            {error}
-          </div>
-        )}
+        <div className="glass-strong rounded-[2rem] p-8">
+          <h1 className="text-center font-display text-2xl font-semibold">Welcome back</h1>
+          <p className="lg-muted mb-6 mt-1 text-center text-sm">Sign in to your account</p>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1 text-black">
+          {error && (
+            <div role="alert" className="mb-4 rounded-xl border border-red-400/40 bg-red-500/15 p-3 text-sm text-red-100">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <label className="block text-sm font-medium">
               Username
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoComplete="username"
+                className="lg-input mt-1.5"
+                required
+              />
             </label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1 text-black">
+            <label className="block text-sm font-medium">
               Password
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                className="lg-input mt-1.5"
+                required
+              />
             </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
-          >
-            {loading ? "Signing in..." : "Sign In"}
-          </button>
-        </form>
+            <button type="submit" disabled={loading} className="btn-gold w-full">
+              {loading ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+
+          <p className="lg-muted mt-6 text-center text-xs leading-relaxed">
+            Accounts are created by Luna Soft staff. Need access? Contact our sales team.
+          </p>
+        </div>
+
+        <p className="mt-5 text-center text-sm">
+          <Link href="/" className="lg-muted hover:text-gold-light">
+            ← Back to home
+          </Link>
+        </p>
       </div>
     </div>
   );

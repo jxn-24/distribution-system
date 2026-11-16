@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const navItems = [
   {
@@ -47,10 +47,10 @@ const navItems = [
     roles: ["Super Admin", "Admin", "Warehouse"],
   },
   {
-  href: "/reports/margin",
-  label: "Margin",
-  roles: ["Super Admin", "Admin", "Director", "Finance"],
-},
+    href: "/reports/margin",
+    label: "Margin",
+    roles: ["Super Admin", "Admin", "Director", "Finance"],
+  },
   {
     href: "/record-payment",
     label: "Record Payment",
@@ -72,6 +72,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const { user, logout, isLoading } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -81,8 +82,8 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   if (isLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
-        <p className="text-gray-600">Loading...</p>
+      <div className="lg-page flex items-center justify-center">
+        <p className="lg-muted">Loading...</p>
       </div>
     );
   }
@@ -95,32 +96,65 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     return item.roles.some((r) => roleNames.includes(r));
   });
 
-  return (
-    <div className="min-h-screen bg-neutral-100 text-neutral-950 flex">
-      <aside className="w-64 bg-neutral-950 text-neutral-100 flex flex-col border-r border-neutral-800">
-        <div className="p-5 border-b border-neutral-800">
-          <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-full border border-amber-400/60 bg-amber-400/10 flex items-center justify-center text-amber-300 font-display text-2xl leading-none">
-              ☾
-            </div>
-            <div>
-              <p className="font-display font-semibold text-sm tracking-wide">LUNA SOFT</p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</p>
-            </div>
-          </Link>
-        </div>
+  const brand = (
+    <Link href="/dashboard" className="lg-focus flex items-center gap-3 rounded-xl">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-gold/60 bg-gold/10 font-display text-2xl leading-none text-gold">
+        ☾
+      </div>
+      <div>
+        <p className="font-display text-sm font-semibold tracking-wide">LUNA SOFT</p>
+        <p className="text-[10px] uppercase tracking-[0.2em] text-gold">Essentials</p>
+      </div>
+    </Link>
+  );
 
-        <nav className="flex-1 p-3 space-y-1">
+  return (
+    <div className="lg-page flex">
+      {/* mobile top bar */}
+      <header className="glass-strong fixed inset-x-0 top-0 z-30 flex items-center justify-between px-4 py-3 lg:hidden">
+        {brand}
+        <button
+          type="button"
+          onClick={() => setMenuOpen((open) => !open)}
+          aria-expanded={menuOpen}
+          aria-controls="app-sidebar"
+          aria-label={menuOpen ? "Close menu" : "Open menu"}
+          className="btn-glass !min-h-10 !px-4"
+        >
+          {menuOpen ? "Close" : "Menu"}
+        </button>
+      </header>
+
+      {menuOpen && (
+        <button
+          type="button"
+          aria-label="Close menu"
+          onClick={() => setMenuOpen(false)}
+          className="fixed inset-0 z-30 bg-black/60 lg:hidden"
+        />
+      )}
+
+      <aside
+        id="app-sidebar"
+        className={`glass-strong fixed inset-y-0 left-0 z-40 flex w-64 flex-col rounded-none border-y-0 border-l-0 transition-transform duration-200 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 ${
+          menuOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="border-b border-white/10 p-5">{brand}</div>
+
+        <nav aria-label="App" className="flex-1 space-y-1 overflow-y-auto p-3">
           {visibleNav.map((item) => {
             const active = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`block px-3 py-2 rounded-lg text-sm transition ${
+                aria-current={active ? "page" : undefined}
+                onClick={() => setMenuOpen(false)}
+                className={`block rounded-xl px-3 py-2.5 text-sm transition ${
                   active
-                    ? "bg-amber-400 text-neutral-950 font-semibold"
-                    : "text-neutral-300 hover:bg-neutral-800 hover:text-white"
+                    ? "bg-gradient-to-r from-gold-light to-gold font-semibold text-ink shadow-[0_8px_24px_-10px_rgba(232,189,60,0.8)]"
+                    : "text-white/75 hover:bg-white/10 hover:text-white"
                 }`}
               >
                 {item.label}
@@ -129,20 +163,17 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           })}
         </nav>
 
-        <div className="p-4 border-t border-neutral-800">
+        <div className="border-t border-white/10 p-4">
           <p className="text-sm font-medium">{user.username}</p>
-          <p className="text-xs text-neutral-400 mb-3">{roleNames.join(", ")}</p>
-          <button
-            onClick={logout}
-            className="w-full text-sm border border-neutral-600 text-neutral-200 hover:border-amber-400 hover:text-amber-300 px-3 py-2 rounded-md transition"
-          >
+          <p className="mb-3 text-xs text-white/55">{roleNames.join(", ")}</p>
+          <button onClick={logout} className="btn-glass w-full !min-h-10">
             Logout
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 overflow-auto">
-        <div className="p-6">{children}</div>
+      <main className="min-w-0 flex-1 overflow-auto pt-16 lg:pt-0">
+        <div className="lg-legacy p-4 sm:p-6">{children}</div>
       </main>
     </div>
   );

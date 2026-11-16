@@ -42,8 +42,8 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-gray-600">Loading dashboard...</p>
+      <div className="lg-page flex items-center justify-center">
+        <p className="lg-muted">Loading dashboard...</p>
       </div>
     );
   }
@@ -177,33 +177,41 @@ export default function DashboardPage() {
 
   return (
     <AppShell>
-      <div className={`${content.color} text-white border-t-4 border-amber-400 rounded-lg p-6 mb-8`}>
-        <p className="text-amber-300 text-xs font-semibold uppercase tracking-[0.18em] mb-2">☾ Luna Soft Essentials</p>
-        <h2 className="text-2xl font-bold mb-1">{content.title}</h2>
-        <p className="text-neutral-300">{content.subtitle}</p>
+      <div className="glass-gold mb-8 rounded-3xl p-6 sm:p-8">
+        <p className="lg-eyebrow mb-3">☾ Luna Soft Essentials</p>
+        <h2 className="font-display text-2xl font-semibold sm:text-3xl">{content.title}</h2>
+        <p className="lg-muted mt-1">{content.subtitle}</p>
+        <p className="mt-4 text-sm text-white/80">
+          Signed in as <span className="font-semibold text-gold-light">{user.first_name || user.username}</span>
+        </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-lg border border-neutral-200 shadow-sm p-6">
-          <h3 className="font-semibold text-neutral-950 mb-4">Quick Actions</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {content.quickLinks.map((link, index) => (
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div className="glass rounded-3xl p-6 lg:col-span-2">
+          <h3 className="mb-4 font-display text-lg font-semibold">Quick Actions</h3>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {content.quickLinks.map((link, index) =>
               quickActionRoutes[link] ? (
                 <Link
                   key={`${link}-${index}`}
                   href={quickActionRoutes[link]}
-                  className="block border border-neutral-200 border-l-2 border-l-amber-400 rounded-md px-4 py-3 text-sm text-neutral-700 hover:bg-amber-50 hover:border-amber-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                >{link}</Link>
+                  className="glass glass-hover lg-focus flex items-center justify-between rounded-2xl px-4 py-4 text-sm font-medium"
+                >
+                  {link}
+                  <span aria-hidden className="text-gold">→</span>
+                </Link>
               ) : (
-                <span key={`${link}-${index}`} className="block border border-neutral-200 rounded-md px-4 py-3 text-sm text-neutral-400">{link}</span>
-              )
-            ))}
+                <span key={`${link}-${index}`} className="rounded-2xl border border-white/10 px-4 py-4 text-sm text-white/40">
+                  {link}
+                </span>
+              ),
+            )}
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-neutral-200 shadow-sm p-6">
-          <h3 className="font-semibold text-neutral-950 mb-3">Access Notes</h3>
-          <p className="text-sm text-neutral-600 leading-relaxed">{content.notes}</p>
+        <div className="glass rounded-3xl p-6">
+          <h3 className="mb-3 font-display text-lg font-semibold">Access Notes</h3>
+          <p className="lg-muted text-sm leading-relaxed">{content.notes}</p>
         </div>
       </div>
     </AppShell>

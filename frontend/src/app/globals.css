@@ -1,8 +1,28 @@
 @import "tailwindcss";
 
+/* ------------------------------------------------------------------
+   Luna Soft glass theme: black, gold and white.
+   Tokens first, then reusable glass classes, then a temporary
+   "legacy" shim that re-skins pages not yet migrated to the new classes.
+------------------------------------------------------------------- */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --lg-bg: #07070a;
+  --lg-bg-raised: #0e0e13;
+  --lg-gold: #e8bd3c;
+  --lg-gold-light: #f6dc8a;
+  --lg-gold-deep: #b8860b;
+  --lg-glass: rgba(255, 255, 255, 0.06);
+  --lg-glass-strong: rgba(255, 255, 255, 0.11);
+  --lg-border: rgba(255, 255, 255, 0.14);
+  --lg-border-gold: rgba(232, 189, 60, 0.38);
+  --lg-text: #ffffff;
+  --lg-muted: rgba(255, 255, 255, 0.68);
+  --lg-faint: rgba(255, 255, 255, 0.45);
+
+  /* kept for older components */
+  --background: var(--lg-bg);
+  --foreground: var(--lg-text);
   --luna-black: #0a0a0a;
   --luna-gold: #f5c518;
   --luna-gold-soft: #e8b923;
@@ -11,13 +31,34 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-gold: #e8bd3c;
+  --color-gold-light: #f6dc8a;
+  --color-gold-deep: #b8860b;
+  --color-ink: #07070a;
   --font-sans: var(--font-figtree), system-ui, sans-serif;
   --font-display: var(--font-outfit), system-ui, sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--lg-bg);
+  color: var(--lg-text);
   font-family: var(--font-figtree), system-ui, sans-serif;
 }
 
@@ -27,4 +68,263 @@ body {
 
 .font-body {
   font-family: var(--font-figtree), system-ui, sans-serif;
+}
+
+/* ---------- page backdrop: black with soft gold light ---------- */
+.lg-page {
+  min-height: 100vh;
+  background:
+    radial-gradient(60rem 36rem at 85% -8%, rgba(232, 189, 60, 0.20), transparent 60%),
+    radial-gradient(44rem 30rem at -10% 35%, rgba(232, 189, 60, 0.09), transparent 62%),
+    radial-gradient(50rem 30rem at 60% 110%, rgba(246, 220, 138, 0.10), transparent 60%),
+    var(--lg-bg);
+  background-attachment: fixed;
+}
+
+/* ---------- glass surfaces ---------- */
+.glass {
+  background: var(--lg-glass);
+  border: 1px solid var(--lg-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.10),
+    0 18px 50px -20px rgba(0, 0, 0, 0.7);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+.glass-strong {
+  background: var(--lg-glass-strong);
+  border: 1px solid var(--lg-border);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 24px 60px -22px rgba(0, 0, 0, 0.8);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  backdrop-filter: blur(24px) saturate(150%);
+}
+
+.glass-gold {
+  background: linear-gradient(135deg, rgba(232, 189, 60, 0.16), rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--lg-border-gold);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    0 20px 60px -24px rgba(232, 189, 60, 0.35);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+}
+
+.glass-hover {
+  transition: transform 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+.glass-hover:hover {
+  transform: translateY(-3px);
+  border-color: var(--lg-border-gold);
+  background: var(--lg-glass-strong);
+}
+
+/* browsers without backdrop-filter get a solid, still-readable panel */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .glass-strong,
+  .glass-gold {
+    background: rgba(22, 22, 28, 0.94);
+  }
+}
+
+/* ---------- type helpers ---------- */
+.gold-text {
+  background: linear-gradient(120deg, var(--lg-gold-light), var(--lg-gold) 45%, var(--lg-gold-deep));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lg-eyebrow {
+  font-size: 0.72rem;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--lg-gold);
+}
+
+.lg-muted {
+  color: var(--lg-muted);
+}
+
+/* ---------- buttons ---------- */
+.btn-gold,
+.btn-glass {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.4rem;
+  border-radius: 9999px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease, border-color 160ms ease;
+}
+
+.btn-gold {
+  color: #17110a;
+  background: linear-gradient(135deg, var(--lg-gold-light), var(--lg-gold) 55%, var(--lg-gold-deep));
+  box-shadow: 0 10px 30px -10px rgba(232, 189, 60, 0.65);
+}
+.btn-gold:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 36px -10px rgba(232, 189, 60, 0.85);
+}
+.btn-gold:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-glass {
+  color: var(--lg-text);
+  background: var(--lg-glass);
+  border: 1px solid var(--lg-border);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+.btn-glass:hover {
+  border-color: var(--lg-border-gold);
+  background: var(--lg-glass-strong);
+}
+
+.btn-gold:focus-visible,
+.btn-glass:focus-visible,
+.lg-focus:focus-visible {
+  outline: 2px solid var(--lg-gold);
+  outline-offset: 3px;
+}
+
+/* ---------- form fields ---------- */
+.lg-input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 0.9rem;
+  border-radius: 0.75rem;
+  color: var(--lg-text);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.lg-input::placeholder {
+  color: var(--lg-faint);
+}
+.lg-input:focus {
+  outline: none;
+  border-color: var(--lg-gold);
+  box-shadow: 0 0 0 3px rgba(232, 189, 60, 0.25);
+}
+
+/* ---------- entrance animation (replaces the 2s JS timer) ---------- */
+@keyframes lg-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.lg-rise {
+  animation: lg-rise 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.lg-rise-delay {
+  animation-delay: 150ms;
+}
+
+section[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* ------------------------------------------------------------------
+   LEGACY SHIM
+   Pages inside <AppShell> were written with white cards and dark text.
+   Until each is migrated to .glass / .lg-input, this re-skins them so
+   the whole app is already black, gold and white. Delete a rule here
+   once no page needs it.
+------------------------------------------------------------------- */
+.lg-legacy .bg-white,
+.lg-legacy .bg-neutral-100 {
+  background: var(--lg-glass);
+  border: 1px solid var(--lg-border);
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
+  color: var(--lg-text);
+}
+.lg-legacy .bg-neutral-50,
+.lg-legacy .bg-gray-50 {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--lg-text);
+}
+.lg-legacy .text-neutral-950,
+.lg-legacy .text-neutral-900,
+.lg-legacy .text-neutral-800,
+.lg-legacy .text-black,
+.lg-legacy .text-gray-900,
+.lg-legacy .text-gray-800 {
+  color: var(--lg-text);
+}
+.lg-legacy .text-neutral-700,
+.lg-legacy .text-neutral-600,
+.lg-legacy .text-neutral-500,
+.lg-legacy .text-gray-700,
+.lg-legacy .text-gray-600,
+.lg-legacy .text-gray-500 {
+  color: var(--lg-muted);
+}
+.lg-legacy .text-neutral-400 {
+  color: var(--lg-faint);
+}
+.lg-legacy .text-blue-700,
+.lg-legacy .text-blue-600 {
+  color: var(--lg-gold-light);
+}
+.lg-legacy .border-neutral-200,
+.lg-legacy .border-neutral-300,
+.lg-legacy .border-gray-300,
+.lg-legacy .border-b,
+.lg-legacy .border-t {
+  border-color: var(--lg-border);
+}
+.lg-legacy input,
+.lg-legacy select,
+.lg-legacy textarea {
+  color: var(--lg-text);
+  background-color: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+.lg-legacy input::placeholder,
+.lg-legacy textarea::placeholder {
+  color: var(--lg-faint);
+}
+.lg-legacy input:focus,
+.lg-legacy select:focus,
+.lg-legacy textarea:focus {
+  outline: none;
+  border-color: var(--lg-gold);
+  box-shadow: 0 0 0 3px rgba(232, 189, 60, 0.25);
+}
+.lg-legacy option {
+  background: #111116;
+  color: #fff;
+}
+/* primary buttons were black-on-white with gold text; make them gold */
+.lg-legacy button.bg-neutral-950,
+.lg-legacy a.bg-neutral-950 {
+  background: linear-gradient(135deg, var(--lg-gold-light), var(--lg-gold) 55%, var(--lg-gold-deep));
+  color: #17110a;
+  border: 0;
+}
+.lg-legacy button.border-neutral-400,
+.lg-legacy button.border-neutral-300 {
+  border-color: var(--lg-border);
+  color: var(--lg-text);
+}
+.lg-legacy tbody tr:hover {
+  background: rgba(255, 255, 255, 0.04);
 }

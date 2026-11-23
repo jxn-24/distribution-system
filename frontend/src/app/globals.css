@@ -46,3 +46,63 @@ body {
     animation: none;
   }
 }
+
+/* Staff dashboard: night band with one gold glow, glass tiles above it.
+   Glass only ever sits on this band (DESIGN.md, The Glass Is for Glancing Rule). */
+.night-band {
+  background: #0a0a0a;
+}
+
+.night-band ::selection {
+  background: rgba(251, 191, 36, 0.35);
+  color: #ffffff;
+}
+
+/* The one gold glow, placed behind the tile grid so every glass tile catches it. */
+.glass-stage {
+  position: relative;
+  isolation: isolate;
+}
+
+.glass-stage::before {
+  content: "";
+  position: absolute;
+  inset: -30% -8%;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(closest-side, rgba(251, 191, 36, 0.3), rgba(251, 191, 36, 0.1) 60%, transparent);
+}
+
+/* Four tiles in a row: widen the glow so the outer tiles still sit in its light. */
+@media (min-width: 1024px) {
+  .glass-stage::before {
+    inset: -45% -28%;
+  }
+}
+
+.glass-tile {
+  background: #262626;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+}
+
+@supports ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
+  .glass-tile {
+    background: rgba(255, 255, 255, 0.07);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .glass-tile {
+    background: #262626;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+/* Sideways scroll rows on the night band: a thin gold thumb instead of the grey default. */
+.night-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.4) transparent;
+}

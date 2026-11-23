@@ -98,7 +98,7 @@ export default function ReadyToPackPage() {
       )}
 
       {!loading && !error && (
-        <div className="bg-white rounded-xl shadow overflow-hidden border border-neutral-100">
+        <div className="bg-white rounded-xl shadow overflow-x-auto border border-neutral-100">
           <table className="w-full text-sm">
             <thead className="bg-neutral-50 border-b">
               <tr>

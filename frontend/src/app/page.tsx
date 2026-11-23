@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
 const products = [
   {
@@ -42,13 +41,6 @@ const objectives = [
 ];
 
 export default function HomePage() {
-  const [showHero, setShowHero] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowHero(true), 2000);
-    return () => clearTimeout(timer);
-  }, []);
-
   function scrollToSection(id: string) {
     const target = document.getElementById(id);
     if (!target) return;
@@ -71,11 +63,12 @@ export default function HomePage() {
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:grid md:grid-cols-3 md:items-center md:px-5 md:py-4">
           <Link href="/" className="flex items-center gap-3">
             <Image
-              src="/images/Luna_Soft_Essentials_logo.jpeg"
-              alt="Luna Soft Essentials Ltd."
-              width={100}
-              height={100}
-              className="h-11 w-11 shrink-0 rounded-md object-cover"
+              src="/images/luna-crescent.png"
+              alt=""
+              width={44}
+              height={44}
+              loading="eager"
+              className="h-11 w-11 shrink-0"
             />
             <span className="leading-tight">
               <span className="block font-display text-sm font-semibold tracking-wide">LUNA SOFT</span>
@@ -101,8 +94,8 @@ export default function HomePage() {
             Luna Soft Essentials Ltd. brings everyday hygiene products designed for comfort, dignity, and reliable protection — for every body, every day.
           </p>
         </div>
-        <div className={`mx-auto w-full max-w-xs transition-all duration-700 ${showHero ? "scale-100 opacity-100" : "scale-95 opacity-0"}`}>
-          <Image src="/images/product-all.jpg" alt="Luna Soft Essentials products" width={640} height={640} className="h-72 w-full rounded-3xl object-contain shadow-[0_0_40px_rgba(251,191,36,0.28)]" priority />
+        <div className="hero-rise mx-auto w-full max-w-xs">
+          <Image src="/images/product-all.jpg" alt="Luna Soft Essentials products" width={640} height={640} className="h-72 w-full rounded-3xl object-contain shadow-[0_0_40px_rgba(251,191,36,0.28)]" preload />
         </div>
       </section>
 
@@ -178,7 +171,7 @@ export default function HomePage() {
       <footer className="border-t border-neutral-800 bg-neutral-950">
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-5 py-6">
           <div className="flex items-center gap-3">
-            <Image src="/images/Luna_Soft_Essentials_logo.jpeg" alt="Luna Soft Essentials" width={42} height={42} className="h-10 w-10 rounded-md object-cover" />
+            <Image src="/images/luna-crescent.png" alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
             <div>
               <p className="text-sm font-semibold tracking-wide">LUNA SOFT ESSENTIALS</p>
               <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">Gentle care. Strong protection.</p>

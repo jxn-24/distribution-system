@@ -311,7 +311,7 @@ export default function SalesOrdersPage() {
       {error && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
       {!loading && (
-        <div className="overflow-hidden rounded-xl bg-white shadow">
+        <div className="overflow-x-auto rounded-xl bg-white shadow">
           <table className="w-full text-sm">
             <thead className="border-b bg-neutral-50">
               <tr>

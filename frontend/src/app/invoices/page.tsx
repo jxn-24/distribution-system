@@ -93,7 +93,7 @@ export default function InvoicesPage() {
       {message && <p className="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-800">{message}</p>}
       {error && <p className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-700">{error}</p>}
 
-      <div className="overflow-hidden rounded-xl bg-white shadow">
+      <div className="overflow-x-auto rounded-xl bg-white shadow">
         <table className="w-full text-sm">
           <thead className="border-b bg-neutral-50">
             <tr>

@@ -115,7 +115,7 @@ export default function MarginPage() {
             </div>
           </div>
 
-          <div className="overflow-hidden rounded-xl bg-white shadow">
+          <div className="overflow-x-auto rounded-xl bg-white shadow">
             <table className="w-full text-sm">
               <thead className="border-b bg-neutral-50">
                 <tr>

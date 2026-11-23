@@ -28,3 +28,21 @@ body {
 .font-body {
   font-family: var(--font-figtree), system-ui, sans-serif;
 }
+
+/* Homepage hero product shot: visible from the first frame, settles in quickly. */
+@keyframes hero-rise {
+  from {
+    opacity: 0.6;
+    transform: scale(0.97);
+  }
+}
+
+.hero-rise {
+  animation: hero-rise 450ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-rise {
+    animation: none;
+  }
+}

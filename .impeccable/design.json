@@ -1,0 +1,343 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-23T00:00:00Z",
+  "title": "Design System: Luna Soft Essentials",
+  "extensions": {
+    "colorMeta": {
+      "luna-black": {
+        "role": "primary",
+        "displayName": "Luna Black",
+        "canonical": "oklch(14.5% 0 0)",
+        "tonalRamp": [
+          "oklch(14.5% 0 0)",
+          "oklch(20.5% 0 0)",
+          "oklch(26.9% 0 0)",
+          "oklch(37.1% 0 0)",
+          "oklch(43.9% 0 0)",
+          "oklch(55.6% 0 0)",
+          "oklch(70.8% 0 0)",
+          "oklch(87% 0 0)"
+        ]
+      },
+      "gold-bright": {
+        "role": "primary",
+        "displayName": "Crescent Gold",
+        "canonical": "oklch(87.9% 0.169 91.605)",
+        "tonalRamp": [
+          "oklch(27.9% 0.077 45.635)",
+          "oklch(41.4% 0.112 45.904)",
+          "oklch(47.3% 0.137 46.201)",
+          "oklch(55.5% 0.163 48.998)",
+          "oklch(66.6% 0.179 58.318)",
+          "oklch(76.9% 0.188 70.08)",
+          "oklch(87.9% 0.169 91.605)",
+          "oklch(96.2% 0.059 95.617)"
+        ]
+      },
+      "gold-solid": {
+        "role": "primary",
+        "displayName": "Lamp Gold",
+        "canonical": "oklch(82.8% 0.189 84.429)"
+      },
+      "gold-ink": {
+        "role": "primary",
+        "displayName": "Brass Ink",
+        "canonical": "oklch(55.5% 0.163 48.998)"
+      },
+      "gold-wash": {
+        "role": "primary",
+        "displayName": "Gold Wash",
+        "canonical": "oklch(96.2% 0.059 95.617)"
+      },
+      "canvas": {
+        "role": "neutral",
+        "displayName": "Canvas",
+        "canonical": "oklch(97% 0 0)"
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#ffffff"
+      },
+      "paper-tint": {
+        "role": "neutral",
+        "displayName": "Paper Tint",
+        "canonical": "oklch(98.5% 0 0)"
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "oklch(92.2% 0 0)"
+      },
+      "field-stroke": {
+        "role": "neutral",
+        "displayName": "Field Stroke",
+        "canonical": "oklch(87% 0 0)"
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "oklch(14.5% 0 0)"
+      },
+      "ink-body": {
+        "role": "neutral",
+        "displayName": "Ink Body",
+        "canonical": "oklch(26.9% 0 0)"
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Ink Muted",
+        "canonical": "oklch(55.6% 0 0)"
+      },
+      "night-line": {
+        "role": "neutral",
+        "displayName": "Night Line",
+        "canonical": "oklch(26.9% 0 0)"
+      },
+      "night-text": {
+        "role": "neutral",
+        "displayName": "Night Text",
+        "canonical": "oklch(87% 0 0)"
+      },
+      "page-accent-blue": {
+        "role": "secondary",
+        "displayName": "Page Accent Blue",
+        "canonical": "oklch(37.9% 0.146 265.522)"
+      },
+      "status-info-bg": {
+        "role": "tertiary",
+        "displayName": "Status Info (bg)",
+        "canonical": "oklch(93.2% 0.032 255.585)"
+      },
+      "status-info-text": {
+        "role": "tertiary",
+        "displayName": "Status Info (text)",
+        "canonical": "oklch(48.8% 0.243 264.376)"
+      },
+      "status-ok-bg": {
+        "role": "tertiary",
+        "displayName": "Status OK (bg)",
+        "canonical": "oklch(96.2% 0.044 156.743)"
+      },
+      "status-ok-text": {
+        "role": "tertiary",
+        "displayName": "Status OK (text)",
+        "canonical": "oklch(52.7% 0.154 150.069)"
+      },
+      "status-wait-bg": {
+        "role": "tertiary",
+        "displayName": "Status Wait (bg)",
+        "canonical": "oklch(96.2% 0.059 95.617)"
+      },
+      "status-wait-text": {
+        "role": "tertiary",
+        "displayName": "Status Wait (text)",
+        "canonical": "oklch(41.4% 0.112 45.904)"
+      },
+      "status-error-bg": {
+        "role": "tertiary",
+        "displayName": "Status Error (bg)",
+        "canonical": "oklch(97.1% 0.013 17.38)"
+      },
+      "status-error-text": {
+        "role": "tertiary",
+        "displayName": "Status Error (text)",
+        "canonical": "oklch(50.5% 0.213 27.518)"
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Homepage hero headline only."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Staff page titles (h1) and dashboard figures."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Card and section headings."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "App default: tables, nav, buttons, help text."
+      },
+      "body-field": {
+        "displayName": "Body Field",
+        "purpose": "Text typed into inputs; never below 16px."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Uppercase eyebrows and the ESSENTIALS line."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "LUNA SOFT wordmark beside the crescent."
+      }
+    },
+    "shadows": [
+      {
+        "name": "card-rest",
+        "value": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
+        "purpose": "Every white card and table container; removed in print."
+      },
+      {
+        "name": "lamp-glow",
+        "value": "0 0 40px rgba(251,191,36,0.28)",
+        "purpose": "Homepage hero product image."
+      },
+      {
+        "name": "scan-beam",
+        "value": "0 0 12px rgba(251,191,36,0.9)",
+        "purpose": "Live gold line across the camera scan frame."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-transition",
+        "value": "150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        "purpose": "Nav and button hover/active colour changes (Tailwind transition default)."
+      },
+      {
+        "name": "hero-reveal",
+        "value": "700ms scale(0.95→1) + opacity",
+        "purpose": "Homepage hero product image entrance."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "xl",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button (night)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Default action on white pages: Luna Black fill, Crescent Gold label.",
+      "html": "<button class=\"ds-btn-primary\">Record payment</button>",
+      "css": ".ds-btn-primary { min-height: 44px; padding: 0 16px; border: none; border-radius: 0.375rem; background: oklch(14.5% 0 0); color: oklch(87.9% 0.169 91.605); font: 600 0.875rem/1.43 Figtree, system-ui, sans-serif; cursor: pointer; transition: background 150ms; } .ds-btn-primary:hover { background: oklch(26.9% 0 0); } .ds-btn-primary:focus-visible { outline: 2px solid oklch(82.8% 0.189 84.429); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }"
+    },
+    {
+      "name": "Gold Button",
+      "kind": "button",
+      "refersTo": "button-gold",
+      "description": "Strongest action on night screens.",
+      "html": "<button class=\"ds-btn-gold\">Confirm receive</button>",
+      "css": ".ds-btn-gold { min-height: 48px; padding: 0 20px; border: none; border-radius: 0.375rem; background: oklch(82.8% 0.189 84.429); color: oklch(14.5% 0 0); font: 700 0.875rem/1.43 Figtree, system-ui, sans-serif; cursor: pointer; transition: background 150ms; } .ds-btn-gold:hover { background: oklch(87.9% 0.169 91.605); } .ds-btn-gold:focus-visible { outline: 2px solid oklch(14.5% 0 0); outline-offset: 2px; }"
+    },
+    {
+      "name": "Outline Gold Button",
+      "kind": "button",
+      "refersTo": "button-outline-gold",
+      "description": "Secondary action on Luna Black.",
+      "html": "<div style=\"background:oklch(14.5% 0 0);padding:16px\"><button class=\"ds-btn-outline-gold\">Enter code manually</button></div>",
+      "css": ".ds-btn-outline-gold { min-height: 48px; padding: 0 16px; border: 1px solid oklch(82.8% 0.189 84.429); border-radius: 0.375rem; background: transparent; color: oklch(87.9% 0.169 91.605); font: 600 0.875rem/1.43 Figtree, system-ui, sans-serif; cursor: pointer; transition: background 150ms; } .ds-btn-outline-gold:hover { background: rgba(251,191,36,0.1); } .ds-btn-outline-gold:focus-visible { outline: 2px solid oklch(87.9% 0.169 91.605); outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input-field",
+      "description": "Standard form field with label above; 16px text.",
+      "html": "<label class=\"ds-field\"><span>Amount (KES)</span><input class=\"ds-input\" value=\"12,500\" /></label>",
+      "css": ".ds-field { display: block; font: 500 0.875rem/1.43 Figtree, system-ui, sans-serif; color: oklch(26.9% 0 0); } .ds-input { display: block; margin-top: 4px; width: 100%; min-height: 44px; padding: 0 12px; border: 1px solid oklch(87% 0 0); border-radius: 0.375rem; background: #fff; color: oklch(14.5% 0 0); font: 400 1rem/1.5 Figtree, system-ui, sans-serif; } .ds-input:focus-visible { outline: 2px solid oklch(82.8% 0.189 84.429); outline-offset: 1px; border-color: oklch(55.5% 0.163 48.998); }"
+    },
+    {
+      "name": "Sidebar Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Luna Black sidebar with crescent wordmark and gold active item.",
+      "html": "<nav class=\"ds-nav\"><div class=\"ds-brand\"><img class=\"ds-crescent\" src=\"/images/luna-crescent.png\" alt=\"\" width=\"40\" height=\"40\" /><span><b>LUNA SOFT</b><i>Essentials</i></span></div><a class=\"ds-nav-item ds-active\" href=\"#\">Dashboard</a><a class=\"ds-nav-item\" href=\"#\">Sales Orders</a><a class=\"ds-nav-item\" href=\"#\">Shipments</a></nav>",
+      "css": ".ds-nav { width: 256px; padding: 12px; background: oklch(14.5% 0 0); font-family: Figtree, system-ui, sans-serif; } .ds-brand { display: flex; align-items: center; gap: 8px; padding: 8px 8px 16px; margin-bottom: 8px; border-bottom: 1px solid oklch(26.9% 0 0); } .ds-crescent { width: 40px; height: 40px; flex-shrink: 0; } .ds-brand b { display: block; color: oklch(97% 0 0); font: 600 0.875rem Outfit, system-ui, sans-serif; letter-spacing: 0.025em; } .ds-brand i { display: block; font-style: normal; color: oklch(87.9% 0.169 91.605); font-size: 0.625rem; text-transform: uppercase; letter-spacing: 0.2em; } .ds-nav-item { display: block; padding: 8px 12px; margin-top: 4px; border-radius: 0.5rem; color: oklch(87% 0 0); font-size: 0.875rem; text-decoration: none; transition: background 150ms, color 150ms; } .ds-nav-item:hover { background: oklch(26.9% 0 0); color: #fff; } .ds-nav-item:focus-visible { outline: 2px solid oklch(82.8% 0.189 84.429); outline-offset: 2px; } .ds-nav-item.ds-active { background: oklch(82.8% 0.189 84.429); color: oklch(14.5% 0 0); font-weight: 600; }"
+    },
+    {
+      "name": "Status Badge",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Order/shipment/payment state; status tints only.",
+      "html": "<span class=\"ds-badge ds-info\">CONFIRMED</span> <span class=\"ds-badge ds-ok\">PAID</span> <span class=\"ds-badge ds-wait\">READY_TO_PACK</span> <span class=\"ds-badge ds-err\">CANCELLED</span>",
+      "css": ".ds-badge { display: inline-block; padding: 4px 8px; border-radius: 0.25rem; font: 500 0.75rem/1.33 Figtree, system-ui, sans-serif; } .ds-info { background: oklch(93.2% 0.032 255.585); color: oklch(48.8% 0.243 264.376); } .ds-ok { background: oklch(96.2% 0.044 156.743); color: oklch(52.7% 0.154 150.069); } .ds-wait { background: oklch(96.2% 0.059 95.617); color: oklch(41.4% 0.112 45.904); } .ds-err { background: oklch(93.6% 0.032 17.717); color: oklch(50.5% 0.213 27.518); }"
+    },
+    {
+      "name": "Record Card with Table",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "White card on Canvas holding a compact, horizontally scrollable table.",
+      "html": "<div class=\"ds-canvas\"><div class=\"ds-card\"><table class=\"ds-table\"><thead><tr><th>Order</th><th>Customer</th><th class=\"ds-num\">Total</th></tr></thead><tbody><tr><td>SO-0142</td><td>Kikuyu Mini Mart</td><td class=\"ds-num\">48,200</td></tr><tr><td>SO-0141</td><td>Thika Wholesalers</td><td class=\"ds-num\">126,750</td></tr></tbody></table></div></div>",
+      "css": ".ds-canvas { background: oklch(97% 0 0); padding: 24px; } .ds-card { overflow-x: auto; background: #fff; border-radius: 0.75rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); } .ds-table { width: 100%; border-collapse: collapse; font: 400 0.875rem/1.43 Figtree, system-ui, sans-serif; color: oklch(14.5% 0 0); } .ds-table thead { background: oklch(98.5% 0 0); } .ds-table th { text-align: left; font-weight: 600; padding: 12px 16px; border-bottom: 1px solid oklch(92.2% 0 0); } .ds-table td { padding: 12px 16px; border-bottom: 1px solid oklch(92.2% 0 0); } .ds-table .ds-num { text-align: right; font-variant-numeric: tabular-nums; } .ds-table tbody tr:hover { background: oklch(98.5% 0 0); }"
+    },
+    {
+      "name": "Scan Frame",
+      "kind": "custom",
+      "refersTo": "button-primary-scan",
+      "description": "Signature warehouse camera view with the live gold scan beam.",
+      "html": "<div class=\"ds-scan\"><div class=\"ds-scan-frame\"><div class=\"ds-scan-beam\"></div></div><button class=\"ds-scan-btn\">Start scanning</button></div>",
+      "css": ".ds-scan { background: oklch(14.5% 0 0); padding: 16px; border-radius: 1.5rem; max-width: 360px; } .ds-scan-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 0.5rem; border: 1px solid oklch(37.1% 0 0); background: #000; } .ds-scan-beam { position: absolute; left: 32px; right: 32px; top: 50%; height: 2px; background: oklch(82.8% 0.189 84.429); box-shadow: 0 0 12px rgba(251,191,36,0.9); } .ds-scan-btn { margin-top: 12px; width: 100%; min-height: 56px; border: none; border-radius: 0.375rem; background: oklch(26.9% 0 0); color: oklch(87.9% 0.169 91.605); font: 700 1.125rem Figtree, system-ui, sans-serif; cursor: pointer; } .ds-scan-btn:focus-visible { outline: 2px solid oklch(82.8% 0.189 84.429); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Shift Ledger",
+    "overview": "This is a quiet, trustworthy instrument for counting stock, packing orders and getting paid. Its world is black and gold. The night side is the near-black sidebar, homepage, scan screen and wordmark. The ledger side is white and light-grey surfaces where the actual records live: tables, forms and receipts. Gold is the brand's light and is used generously as an accent. It marks where you are, what to press and what's live, and it also warms headlines, totals and brand moments.\n\nDensity is set for phones first. Fields are 44–56px tall, tables use compact 14px text with 12px/16px cell padding, and every working screen is a stack of white cards on a light-grey canvas. The homepage takes the same palette and turns it toward warmth, with display-size Outfit headlines, a glowing product shot and dark bands alternating with white ones.\n\nThe staff dashboards will move to a glassy treatment: translucent panels over a dark backdrop with a gold glow, so summary figures float above the night. This is a confirmed direction that hasn't been built yet (see Elevation & Depth). Each staff page will also get its own accent colour for identity, while the crescent logo, sidebar and wordmark stay the same everywhere (see Colors).",
+    "keyCharacteristics": [
+      "Near-black night surfaces (sidebar, homepage, scan) frame white working surfaces.",
+      "Gold is the brand accent, used freely on dark backgrounds, with a darker gold for text on white.",
+      "Outfit for brand and display moments, Figtree for everything you read or type.",
+      "Large phone-sized touch targets (44 / 48 / 56px).",
+      "Flat white cards with one soft shadow, gold glow only for light and live feedback.",
+      "Planned: glass panels on staff dashboards and a colour for each page under a fixed logo."
+    ],
+    "rules": [
+      {
+        "name": "The Constant Crescent Rule",
+        "body": "The logo, sidebar, wordmark and Luna Black and gold shell are identical on every page. Page accents change only the page's own title area and never the brand frame.",
+        "section": "colors"
+      },
+      {
+        "name": "The Brass-on-Paper Rule",
+        "body": "Gold is used freely, but on white it's always Brass Ink (gold-ink) for text. Crescent Gold and Lamp Gold appear only on Luna Black or as solid fills behind dark text.",
+        "section": "colors"
+      },
+      {
+        "name": "The Status Owns Its Colour Rule",
+        "body": "Status tints mean state and nothing else. A page accent never goes on a badge, and a badge never takes the page accent, even when the hues are similar.",
+        "section": "colors"
+      },
+      {
+        "name": "The Swahili Headroom Rule",
+        "body": "Labels, buttons and nav items must handle text about 30% longer than the English. Never fix a width to fit an English label.",
+        "section": "typography"
+      },
+      {
+        "name": "The Glass Is for Glancing Rule",
+        "body": "Glass goes only on dashboard summaries and quick actions. Tables, forms, receipts and anything printed or edited stay on solid Paper.",
+        "section": "elevation"
+      },
+      {
+        "name": "The Gold Light Rule",
+        "body": "Glows are always gold and always mean light or a live state. They're never grey drop shadows used for drama.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do keep the crescent logo, sidebar and Luna Black and gold shell identical on every page (The Constant Crescent Rule).",
+      "Do use gold freely as the brand accent, but use Brass Ink for gold text on white (The Brass-on-Paper Rule).",
+      "Do give each staff page its own accent on the title only, picked from deep tones that pass 4.5:1 on Paper.",
+      "Do keep touch targets at 44px or more, 48px for important form actions and 56px for the main scan action.",
+      "Do put tables inside a card that scrolls horizontally, with numbers right-aligned.",
+      "Do give glass panels a solid near-black fallback and keep their blur at or under 12px."
+    ],
+    "donts": [
+      "Don't colour a status badge with a page accent, or a page title with a status colour.",
+      "Don't put glass behind tables, forms, receipts or printed documents.",
+      "Don't put Crescent Gold (gold-bright) text on white or light grey.",
+      "Don't use the unused --luna-gold variables as if they were the system gold. The amber tones above are the real ones.",
+      "Don't set input text below 16px or fix label widths to English text."
+    ]
+  }
+}

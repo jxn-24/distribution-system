@@ -1,6 +1,6 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-23T00:00:00Z",
+  "generatedAt": "2026-11-23T12:36:01Z",
   "title": "Design System: Luna Soft Essentials",
   "extensions": {
     "colorMeta": {
@@ -99,6 +99,11 @@
         "displayName": "Night Text",
         "canonical": "oklch(87% 0 0)"
       },
+      "night-muted": {
+        "role": "neutral",
+        "displayName": "Night Muted",
+        "canonical": "oklch(70.8% 0 0)"
+      },
       "page-accent-blue": {
         "role": "secondary",
         "displayName": "Page Accent Blue",
@@ -152,7 +157,7 @@
       },
       "headline": {
         "displayName": "Headline",
-        "purpose": "Staff page titles (h1) and dashboard figures."
+        "purpose": "Staff page titles (h1)."
       },
       "title": {
         "displayName": "Title",
@@ -173,6 +178,10 @@
       "wordmark": {
         "displayName": "Wordmark",
         "purpose": "LUNA SOFT wordmark beside the crescent."
+      },
+      "figure": {
+        "displayName": "Figure",
+        "purpose": "Counts on dashboard glass tiles, in Crescent Gold."
       }
     },
     "shadows": [
@@ -190,6 +199,11 @@
         "name": "scan-beam",
         "value": "0 0 12px rgba(251,191,36,0.9)",
         "purpose": "Live gold line across the camera scan frame."
+      },
+      {
+        "name": "dashboard-glow",
+        "value": "radial-gradient(closest-side, rgba(251,191,36,0.3), rgba(251,191,36,0.1) 60%, transparent) at inset -30% -8% (-45% -28% from 1024px)",
+        "purpose": "The one gold glow behind the dashboard tile grid; a background, not a box-shadow."
       }
     ],
     "motion": [
@@ -202,16 +216,61 @@
         "name": "hero-reveal",
         "value": "700ms scale(0.95→1) + opacity",
         "purpose": "Homepage hero product image entrance."
+      },
+      {
+        "name": "figure-count-up",
+        "value": "650ms exponential ease-out (1 - 2^(-10t)), from 0 once on load",
+        "purpose": "Glass tile figures; final value at once under reduced motion."
       }
     ],
     "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
       {
         "name": "md",
         "value": "768px"
       },
       {
+        "name": "lg",
+        "value": "1024px"
+      },
+      {
         "name": "xl",
         "value": "1280px"
+      }
+    ],
+    "glass": [
+      {
+        "name": "glass-fill",
+        "value": "rgba(255,255,255,0.07)",
+        "purpose": "Glass tile fill where backdrop-filter is supported."
+      },
+      {
+        "name": "glass-blur",
+        "value": "backdrop-filter: blur(12px)",
+        "purpose": "Glass tile blur; never above 12px."
+      },
+      {
+        "name": "glass-border",
+        "value": "1px solid rgba(255,255,255,0.12)",
+        "purpose": "Glass tile edge, kept in the fallback."
+      },
+      {
+        "name": "glass-fallback",
+        "value": "#262626 (night-line), no blur",
+        "purpose": "Default fill; also under prefers-reduced-transparency."
+      },
+      {
+        "name": "night-selection",
+        "value": "background rgba(251,191,36,0.35); color #ffffff",
+        "purpose": "Text selection on the night band."
+      },
+      {
+        "name": "night-scroll",
+        "value": "scrollbar-width: thin; scrollbar-color: rgba(251,191,36,0.4) transparent",
+        "purpose": "Sideways quick-action row on phones."
       }
     ]
   },
@@ -279,18 +338,35 @@
       "description": "Signature warehouse camera view with the live gold scan beam.",
       "html": "<div class=\"ds-scan\"><div class=\"ds-scan-frame\"><div class=\"ds-scan-beam\"></div></div><button class=\"ds-scan-btn\">Start scanning</button></div>",
       "css": ".ds-scan { background: oklch(14.5% 0 0); padding: 16px; border-radius: 1.5rem; max-width: 360px; } .ds-scan-frame { position: relative; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 0.5rem; border: 1px solid oklch(37.1% 0 0); background: #000; } .ds-scan-beam { position: absolute; left: 32px; right: 32px; top: 50%; height: 2px; background: oklch(82.8% 0.189 84.429); box-shadow: 0 0 12px rgba(251,191,36,0.9); } .ds-scan-btn { margin-top: 12px; width: 100%; min-height: 56px; border: none; border-radius: 0.375rem; background: oklch(26.9% 0 0); color: oklch(87.9% 0.169 91.605); font: 700 1.125rem Figtree, system-ui, sans-serif; cursor: pointer; } .ds-scan-btn:focus-visible { outline: 2px solid oklch(82.8% 0.189 84.429); outline-offset: 2px; }"
+    },
+    {
+      "name": "Glass Figure Tile",
+      "kind": "card",
+      "refersTo": "glass-tile",
+      "description": "Signature dashboard tile: a Crescent Gold count on glass over the gold glow, opening its records; shown with the gold-outline quick-action row.",
+      "html": "<section class=\"ds-night-band\"><div class=\"ds-glass-stage\"><a class=\"ds-glass-tile\" href=\"#\"><span class=\"ds-tile-top\"><span class=\"ds-tile-fig\">12</span><span class=\"ds-tile-chev\"><svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></span></span><span class=\"ds-tile-text\"><span class=\"ds-tile-label\">Awaiting payment</span><span class=\"ds-tile-detail\">KES 348,200</span></span></a><a class=\"ds-glass-tile\" href=\"#\"><span class=\"ds-tile-top\"><span class=\"ds-tile-fig\">5</span><span class=\"ds-tile-chev\"><svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></span></span><span class=\"ds-tile-text\"><span class=\"ds-tile-label\">Ready to pack</span></span></a><a class=\"ds-glass-tile\" href=\"#\"><span class=\"ds-tile-top\"><span class=\"ds-tile-fig\">3</span><span class=\"ds-tile-chev\"><svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></span></span><span class=\"ds-tile-text\"><span class=\"ds-tile-label\">Low stock</span><span class=\"ds-tile-detail\">products under minimum</span></span></a><a class=\"ds-glass-tile\" href=\"#\"><span class=\"ds-tile-top\"><span class=\"ds-tile-fig ds-idle\">0</span><span class=\"ds-tile-chev\"><svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></span></span><span class=\"ds-tile-text\"><span class=\"ds-tile-label\">Overdue</span></span></a></div><ul class=\"ds-quick\"><li><a class=\"ds-quick-link\" href=\"#\">Sales Orders</a></li><li><a class=\"ds-quick-link\" href=\"#\">Purchase Orders</a></li><li><a class=\"ds-quick-link\" href=\"#\">Inventory Overview</a></li></ul></section>",
+      "css": ".ds-night-band { background: oklch(14.5% 0 0); padding: 24px 16px; font-family: Figtree, system-ui, sans-serif; color: oklch(97% 0 0); } .ds-night-band ::selection { background: rgba(251,191,36,0.35); color: #fff; } .ds-glass-stage { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; } .ds-glass-stage::before { content: \"\"; position: absolute; inset: -30% -8%; z-index: -1; pointer-events: none; background: radial-gradient(closest-side, rgba(251,191,36,0.3), rgba(251,191,36,0.1) 60%, transparent); } .ds-glass-tile { display: flex; flex-direction: column; min-height: 112px; padding: 16px; background: oklch(26.9% 0 0); border: 1px solid rgba(255,255,255,0.12); border-radius: 0.75rem; text-decoration: none; transition: border-color 150ms; } @supports ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) { .ds-glass-tile { background: rgba(255,255,255,0.07); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); } } @media (prefers-reduced-transparency: reduce) { .ds-glass-tile { background: oklch(26.9% 0 0); -webkit-backdrop-filter: none; backdrop-filter: none; } } .ds-glass-tile:hover, .ds-glass-tile:active { border-color: rgba(255,210,48,0.5); } .ds-glass-tile:focus-visible { outline: 2px solid oklch(82.8% 0.189 84.429); outline-offset: 2px; } .ds-tile-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; } .ds-tile-fig { font: 600 2rem/1 Outfit, system-ui, sans-serif; font-variant-numeric: tabular-nums; color: oklch(87.9% 0.169 91.605); } .ds-tile-fig.ds-idle { color: oklch(70.8% 0 0); } .ds-tile-chev { margin-top: 4px; flex-shrink: 0; color: oklch(87% 0 0); transition: color 150ms; } .ds-glass-tile:hover .ds-tile-chev { color: oklch(87.9% 0.169 91.605); } .ds-tile-text { margin-top: 10px; display: block; } .ds-tile-label { display: block; font: 500 0.875rem/1.43 Figtree, system-ui, sans-serif; color: oklch(97% 0 0); } .ds-tile-detail { display: block; margin-top: 2px; font-size: 0.75rem; color: oklch(87% 0 0); } .ds-quick { list-style: none; margin: 20px -16px 0; padding: 0 16px 8px; display: flex; gap: 8px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: thin; scrollbar-color: rgba(251,191,36,0.4) transparent; } .ds-quick li { flex-shrink: 0; } .ds-quick-link { display: flex; align-items: center; min-height: 44px; padding: 0 16px; white-space: nowrap; border: 1px solid rgba(255,186,0,0.7); border-radius: 0.375rem; color: oklch(87.9% 0.169 91.605); font: 600 0.875rem/1.43 Figtree, system-ui, sans-serif; text-decoration: none; transition: background 150ms; } .ds-quick-link:hover, .ds-quick-link:active { background: rgba(251,191,36,0.1); } .ds-quick-link:focus-visible { outline: 2px solid oklch(82.8% 0.189 84.429); outline-offset: 2px; }"
+    },
+    {
+      "name": "Needs Attention Row",
+      "kind": "custom",
+      "refersTo": "attention-row",
+      "description": "Paper list of waiting records with status badge and amount, and a grouped \"N more\" footer.",
+      "html": "<div class=\"ds-attn-canvas\"><h2 class=\"ds-attn-h\">Needs attention</h2><div class=\"ds-attn-card\"><ul class=\"ds-attn-list\"><li><a class=\"ds-attn-row\" href=\"#\"><span class=\"ds-attn-main\"><span class=\"ds-attn-title\">INV-0087</span><span class=\"ds-attn-sub\">Kikuyu Mini Mart</span></span><span class=\"ds-attn-side\"><span class=\"ds-attn-badge ds-err\">4 days overdue</span><span class=\"ds-attn-amt\">KES 18,400</span></span><span class=\"ds-attn-chev\"><svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></span></a></li><li><a class=\"ds-attn-row\" href=\"#\"><span class=\"ds-attn-main\"><span class=\"ds-attn-title\">SO-0142</span><span class=\"ds-attn-sub\">Thika Wholesalers</span></span><span class=\"ds-attn-side\"><span class=\"ds-attn-badge ds-info\">Awaiting payment</span><span class=\"ds-attn-amt\">KES 48,200</span></span><span class=\"ds-attn-chev\"><svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></span></a></li><li><a class=\"ds-attn-row\" href=\"#\"><span class=\"ds-attn-main\"><span class=\"ds-attn-title\">LS-PAD-12</span><span class=\"ds-attn-sub\">Luna Soft Pads, 12 pack</span></span><span class=\"ds-attn-side\"><span class=\"ds-attn-badge ds-wait\">Low stock</span><span class=\"ds-attn-amt\">14 of 40 min</span></span><span class=\"ds-attn-chev\"><svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></span></a></li></ul><ul class=\"ds-attn-more\"><li><a class=\"ds-attn-more-link\" href=\"#\">3 more orders ready to pack<svg viewBox=\"0 0 20 20\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" aria-hidden=\"true\"><path d=\"M7.5 5l5 5-5 5\"/></svg></a></li></ul></div></div>",
+      "css": ".ds-attn-canvas { background: oklch(97% 0 0); padding: 16px; font-family: Figtree, system-ui, sans-serif; } .ds-attn-h { margin: 0; font: 600 1.125rem/1.55 Figtree, system-ui, sans-serif; color: oklch(14.5% 0 0); } .ds-attn-card { margin-top: 12px; overflow: hidden; background: #fff; border-radius: 0.75rem; box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1); } .ds-attn-list, .ds-attn-more { list-style: none; margin: 0; padding: 0; } .ds-attn-list li { border-bottom: 1px solid oklch(92.2% 0 0); } .ds-attn-list li:last-child { border-bottom: 0; } .ds-attn-row { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 12px 16px; text-decoration: none; transition: background 150ms; } .ds-attn-row:hover, .ds-attn-row:active { background: oklch(98.5% 0 0); } .ds-attn-row:focus-visible, .ds-attn-more-link:focus-visible { outline: 2px solid oklch(76.9% 0.188 70.08); outline-offset: -2px; } .ds-attn-main { min-width: 0; flex: 1; } .ds-attn-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 600 0.875rem/1.43 Figtree, system-ui, sans-serif; color: oklch(14.5% 0 0); } .ds-attn-sub { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.75rem; color: oklch(55.6% 0 0); } .ds-attn-side { display: flex; flex-shrink: 0; flex-direction: column; align-items: flex-end; gap: 4px; } .ds-attn-badge { padding: 2px 8px; border-radius: 0.25rem; font: 500 0.75rem/1.33 Figtree, system-ui, sans-serif; } .ds-info { background: oklch(93.2% 0.032 255.585); color: oklch(48.8% 0.243 264.376); } .ds-wait { background: oklch(96.2% 0.059 95.617); color: oklch(41.4% 0.112 45.904); } .ds-err { background: oklch(93.6% 0.032 17.717); color: oklch(50.5% 0.213 27.518); } .ds-attn-amt { font-size: 0.75rem; font-variant-numeric: tabular-nums; color: oklch(37.1% 0 0); } .ds-attn-chev { flex-shrink: 0; display: flex; color: oklch(70.8% 0 0); } .ds-attn-more { border-top: 1px solid oklch(92.2% 0 0); background: oklch(98.5% 0 0); } .ds-attn-more-link { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding: 0 16px; font: 500 0.875rem/1.43 Figtree, system-ui, sans-serif; color: oklch(47.3% 0.137 46.201); text-decoration: none; transition: background 150ms; } .ds-attn-more-link:hover, .ds-attn-more-link:active { background: oklch(97% 0 0); }"
     }
   ],
   "narrative": {
     "northStar": "The Night Shift Ledger",
-    "overview": "This is a quiet, trustworthy instrument for counting stock, packing orders and getting paid. Its world is black and gold. The night side is the near-black sidebar, homepage, scan screen and wordmark. The ledger side is white and light-grey surfaces where the actual records live: tables, forms and receipts. Gold is the brand's light and is used generously as an accent. It marks where you are, what to press and what's live, and it also warms headlines, totals and brand moments.\n\nDensity is set for phones first. Fields are 44–56px tall, tables use compact 14px text with 12px/16px cell padding, and every working screen is a stack of white cards on a light-grey canvas. The homepage takes the same palette and turns it toward warmth, with display-size Outfit headlines, a glowing product shot and dark bands alternating with white ones.\n\nThe staff dashboards will move to a glassy treatment: translucent panels over a dark backdrop with a gold glow, so summary figures float above the night. This is a confirmed direction that hasn't been built yet (see Elevation & Depth). Each staff page will also get its own accent colour for identity, while the crescent logo, sidebar and wordmark stay the same everywhere (see Colors).",
+    "overview": "This is a quiet, trustworthy instrument for counting stock, packing orders and getting paid. Its world is black and gold. The night side is the near-black sidebar, homepage, scan screen and wordmark. The ledger side is white and light-grey surfaces where the actual records live: tables, forms and receipts. Gold is the brand's light and is used generously as an accent. It marks where you are, what to press and what's live, and it also warms headlines, totals and brand moments.\n\nDensity is set for phones first. Fields are 44–56px tall, tables use compact 14px text with 12px/16px cell padding, and every working screen is a stack of white cards on a light-grey canvas. The homepage takes the same palette and turns it toward warmth, with display-size Outfit headlines, a glowing product shot and dark bands alternating with white ones.\n\nThe staff dashboard is glassy. It opens on a Luna Black night band with one soft gold glow, and the summary figures sit on translucent glass tiles above it, so the gold counts float over the night. Each tile opens the records behind its count. Below the band, the \"Needs attention\" list goes back to solid Paper, because those are records (see Elevation & Depth and Components). Each staff page will also get its own accent colour for identity, while the crescent logo, sidebar and wordmark stay the same everywhere (see Colors).",
     "keyCharacteristics": [
       "Near-black night surfaces (sidebar, homepage, scan) frame white working surfaces.",
       "Gold is the brand accent, used freely on dark backgrounds, with a darker gold for text on white.",
       "Outfit for brand and display moments, Figtree for everything you read or type.",
       "Large phone-sized touch targets (44 / 48 / 56px).",
       "Flat white cards with one soft shadow, gold glow only for light and live feedback.",
-      "Planned: glass panels on staff dashboards and a colour for each page under a fixed logo."
+      "Glass figure tiles on the dashboard's night band, with a solid fallback for low-end phones.",
+      "Planned: a colour for each page under a fixed logo."
     ],
     "rules": [
       {

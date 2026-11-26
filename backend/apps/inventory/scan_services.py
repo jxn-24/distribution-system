@@ -209,7 +209,7 @@ def apply_stock_scan(
         return [inv], movements
 
     rows = (
-        Inventory.objects.select_for_update()
+        Inventory.objects.select_for_update(of=("self",))
         .filter(product=product, warehouse=warehouse)
         .order_by("batch__created_at", "id")
     )

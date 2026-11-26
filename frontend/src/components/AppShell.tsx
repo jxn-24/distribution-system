@@ -1,6 +1,6 @@
 "use client";
 
-import Image from "next/image";
+import BrandLogo from "@/components/BrandLogo";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
@@ -81,18 +81,8 @@ function isActive(pathname: string, href: string) {
 function Wordmark() {
   return (
     <>
-      <Image
-        src="/images/luna-crescent.png"
-        alt=""
-        width={40}
-        height={40}
-        loading="eager"
-        className="h-10 w-10 shrink-0"
-      />
-      <span className="leading-tight">
-        <span className="block font-display text-sm font-semibold tracking-wide text-neutral-100">LUNA SOFT</span>
-        <span className="block text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</span>
-      </span>
+      <BrandLogo height={36} alt="Luna Soft" />
+      <span className="text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials</span>
     </>
   );
 }

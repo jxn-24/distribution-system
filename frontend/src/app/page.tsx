@@ -2,6 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import BrandLogo from "@/components/BrandLogo";
+import SocialIcon from "@/components/SocialIcon";
+import { mailtoHref, site, socialLinks, telHref } from "@/lib/site";
+
+const newTab = { target: "_blank", rel: "noopener noreferrer" } as const;
+const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-400";
 
 const products = [
   {
@@ -40,6 +46,15 @@ const objectives = [
   ["Social Impact", "Dignity, comfort, and a better everyday life through accessible hygiene products."],
 ];
 
+function PinIcon({ className }: { className?: string }) {
+  return (
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z" />
+      <circle cx="12" cy="9.5" r="2.5" />
+    </svg>
+  );
+}
+
 export default function HomePage() {
   function scrollToSection(id: string) {
     const target = document.getElementById(id);
@@ -61,18 +76,10 @@ export default function HomePage() {
     <main className="bg-neutral-950 font-sans text-white">
       <header className="sticky top-0 z-20 border-b border-neutral-800 bg-neutral-950/95 backdrop-blur">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 md:grid md:grid-cols-3 md:items-center md:px-5 md:py-4">
-          <Link href="/" className="flex items-center gap-3">
-            <Image
-              src="/images/luna-crescent.png"
-              alt=""
-              width={44}
-              height={44}
-              loading="eager"
-              className="h-11 w-11 shrink-0"
-            />
-            <span className="leading-tight">
-              <span className="block font-display text-sm font-semibold tracking-wide">LUNA SOFT</span>
-              <span className="block text-[10px] uppercase tracking-[0.2em] text-amber-300">Essentials Ltd.</span>
+          <Link href="/" aria-label={`${site.name} home`} className={`flex items-center gap-3 self-start rounded-md ${focusRing}`}>
+            <BrandLogo height={44} alt="" preload />
+            <span className="border-l border-neutral-700 pl-3 text-[10px] uppercase leading-tight tracking-[0.2em] text-amber-300">
+              Essentials<br />Ltd.
             </span>
           </Link>
           <nav className="flex justify-start gap-5 text-sm font-bold md:justify-center md:gap-8">
@@ -152,39 +159,90 @@ export default function HomePage() {
           <h2 className="mt-3 font-display text-4xl font-semibold">Let’s work together</h2>
           <p className="mt-4 text-neutral-600">Wholesalers and retailers — contact our sales team to place orders.</p>
           <div className="mt-8 grid gap-4 md:grid-cols-3">
-            <article className="rounded-2xl bg-neutral-100 px-6 py-5">
+            <article className="flex flex-col items-center rounded-2xl bg-neutral-100 px-6 py-5">
               <p className="text-amber-700">Location</p>
-              <p className="mt-2 font-medium">Kikuyu, Kenya</p>
+              <p className="mt-2 font-medium">{site.location}</p>
+              <a
+                href={site.directions}
+                {...newTab}
+                aria-label={`Get directions to ${site.location} on Google Maps (opens in a new tab)`}
+                className={`mt-4 inline-flex min-h-11 items-center gap-2 rounded-full bg-amber-400 px-5 text-sm font-semibold text-neutral-950 ring-1 ring-amber-500 transition-colors hover:bg-amber-300 ${focusRing}`}
+              >
+                <PinIcon className="h-[18px] w-[18px]" />
+                Get directions
+              </a>
             </article>
             <article className="rounded-2xl bg-neutral-100 px-6 py-5">
               <p className="text-amber-700">Email</p>
-              <a className="mt-2 block font-medium" href="mailto:lunasoftlimited@gmail.com?subject=Enquiry%20from%20the%20website">lunasoftlimited@gmail.com</a>
+              <a className="mt-2 block break-words font-medium underline-offset-4 hover:underline" href={mailtoHref}>{site.email}</a>
             </article>
             <article className="rounded-2xl bg-neutral-100 px-6 py-5">
               <p className="text-amber-700">Phone</p>
-              <a className="mt-2 block font-medium" href="tel:+254721669664">+254 721 669 664</a>
+              <a className="mt-2 block font-medium underline-offset-4 hover:underline" href={telHref}>{site.phone.display}</a>
             </article>
           </div>
+
+          <figure className="mt-6 rounded-3xl border border-amber-400/30 bg-neutral-950/90 p-2 shadow-[0_0_40px_rgba(251,191,36,0.18)] backdrop-blur">
+            <iframe
+              src={site.mapEmbed}
+              title={`Map showing Luna Soft Essentials at ${site.location}`}
+              loading="lazy"
+              referrerPolicy="no-referrer-when-downgrade"
+              className="block h-64 w-full rounded-2xl border-0 sm:h-80 md:h-96"
+            />
+            <figcaption className="px-3 py-3 text-sm text-neutral-300">
+              {site.location}
+            </figcaption>
+          </figure>
         </div>
       </section>
 
       <footer className="border-t border-neutral-800 bg-neutral-950">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-5 py-6">
-          <div className="flex items-center gap-3">
-            <Image src="/images/luna-crescent.png" alt="" width={40} height={40} className="h-10 w-10 shrink-0" />
-            <div>
-              <p className="text-sm font-semibold tracking-wide">LUNA SOFT ESSENTIALS</p>
-              <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">Gentle care. Strong protection.</p>
+        {/* Extra bottom padding on phones keeps the floating WhatsApp button clear of the footer text. */}
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-6 px-5 pb-24 pt-6 md:pb-6">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <BrandLogo height={40} alt={site.name} />
+              <p className="text-[10px] uppercase tracking-[0.14em] text-neutral-400">Gentle care.<br />Strong protection.</p>
             </div>
+            <a
+              href={site.directions}
+              {...newTab}
+              aria-label={`Directions to ${site.location} on Google Maps (opens in a new tab)`}
+              className={`inline-flex min-h-11 items-center gap-2 self-start rounded-md text-sm text-neutral-300 underline decoration-neutral-600 underline-offset-4 transition-colors hover:text-amber-300 hover:decoration-amber-300 ${focusRing}`}
+            >
+              <PinIcon className="h-4 w-4 shrink-0 text-amber-300" />
+              {site.location}
+            </a>
           </div>
-          <div className="flex gap-6 text-sm text-neutral-300">
-            <span>Instagram</span>
-            <span>Facebook</span>
-            <span>TikTok</span>
-          </div>
-          <p className="text-sm text-neutral-400">© 2026 Luna Soft Essentials. All rights reserved.</p>
+          <ul aria-label="Luna Soft on social media" className="flex flex-wrap gap-x-5 gap-y-1 text-sm text-neutral-300">
+            {socialLinks.map((link) => (
+              <li key={link.network}>
+                <a
+                  href={link.href}
+                  {...newTab}
+                  aria-label={`Luna Soft on ${link.label} (opens in a new tab)`}
+                  className={`inline-flex min-h-11 items-center gap-2 rounded-md transition-colors hover:text-amber-300 ${focusRing}`}
+                >
+                  <SocialIcon network={link.network} className="h-[18px] w-[18px]" />
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="text-sm text-neutral-400">© 2026 {site.name}. All rights reserved.</p>
         </div>
       </footer>
+
+      {/* Phones only: always-reachable WhatsApp shortcut. */}
+      <a
+        href={site.social.whatsapp}
+        {...newTab}
+        aria-label="Chat with Luna Soft on WhatsApp (opens in a new tab)"
+        className={`fixed bottom-[max(1rem,env(safe-area-inset-bottom))] right-4 z-30 flex h-12 w-12 items-center justify-center rounded-full bg-amber-400 text-neutral-950 shadow-[0_4px_16px_rgba(0,0,0,0.45)] ring-1 ring-black/20 transition-colors hover:bg-amber-300 md:hidden ${focusRing}`}
+      >
+        <SocialIcon network="whatsapp" className="h-6 w-6" />
+      </a>
     </main>
   );
 }

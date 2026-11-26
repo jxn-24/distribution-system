@@ -127,7 +127,38 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
     ),
+    # Login API: at most 5 attempts a minute from one IP address.
+    "DEFAULT_THROTTLE_RATES": {
+        "login": os.getenv("LOGIN_RATE_LIMIT", "5/min"),
+    },
+    # Number of trusted reverse proxies in front of Django. 0 means the client IP is
+    # REMOTE_ADDR. Set it (e.g. 1) when deployed behind a proxy so the throttle reads
+    # the real client IP from X-Forwarded-For instead of the proxy's.
+    "NUM_PROXIES": int(os.getenv("NUM_PROXIES", "0")),
 }
+
+# Login lockout: after LOGIN_LOCKOUT_THRESHOLD failed attempts for one username within
+# LOGIN_LOCKOUT_WINDOW seconds, that username is locked for LOGIN_LOCKOUT_DURATION seconds.
+LOGIN_LOCKOUT_THRESHOLD = int(os.getenv("LOGIN_LOCKOUT_THRESHOLD", "5"))
+LOGIN_LOCKOUT_WINDOW = int(os.getenv("LOGIN_LOCKOUT_WINDOW", str(15 * 60)))
+LOGIN_LOCKOUT_DURATION = int(os.getenv("LOGIN_LOCKOUT_DURATION", str(15 * 60)))
+
+# The login throttle and lockout counters live in the cache. The default in-memory
+# cache is per process; set CACHE_REDIS_URL (use a different Redis database from the
+# Celery broker, e.g. redis://localhost:6379/1) so the limits hold across workers.
+if os.getenv("CACHE_REDIS_URL"):
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": os.getenv("CACHE_REDIS_URL"),
+        }
+    }
+else:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        }
+    }
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),

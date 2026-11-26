@@ -15,10 +15,10 @@ class CustomerSerializer(serializers.ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get("request")
-        if request and (request.user.is_customer or request.user.is_sales_agent or request.user.is_sales):
+        if request and (request.user.is_sales_agent or request.user.is_sales):
             fields.pop("credit_limit", None)
             fields.pop("notes", None)
-        if request and (request.user.is_customer or request.user.is_sales_agent):
+        if request and request.user.is_sales_agent:
             fields.pop("account_manager", None)
         return fields
 
@@ -71,7 +71,7 @@ class SalesOrderItemSerializer(serializers.ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get("request")
-        if request and (request.user.is_customer or request.user.is_sales_agent):
+        if request and request.user.is_sales_agent:
             fields["unit_price"].read_only = True
         return fields
 
@@ -80,25 +80,6 @@ class SalesOrderSerializer(serializers.ModelSerializer):
     items = SalesOrderItemSerializer(many=True, required=False)
     customer_name = serializers.CharField(source="customer.company_name", read_only=True)
     total_amount = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-
-    def get_fields(self):
-        fields = super().get_fields()
-        request = self.context.get("request")
-        if request and request.user.is_customer:
-            fields.pop("created_by", None)
-            fields["sales_agent"].read_only = True
-            fields["order_number"].required = False
-            fields["order_number"].read_only = True
-            fields["order_date"].required = False
-            fields["status"].read_only = True
-            fields["customer"].required = False
-        return fields
-
-    def validate(self, attrs):
-        request = self.context.get("request")
-        if request and request.user.is_customer and not attrs.get("items"):
-            raise serializers.ValidationError({"items": "Add at least one product to your order."})
-        return attrs
 
     def create(self, validated_data):
         items_data = validated_data.pop("items", [])

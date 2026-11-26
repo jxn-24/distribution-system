@@ -2,6 +2,18 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 
+# The customer portal was removed. Customers are business records (sales.Customer)
+# managed by staff; they no longer have login accounts. These role names are kept
+# only so the login API can refuse any account that still carries one.
+RETIRED_CUSTOMER_ROLES = (
+    "Customer",
+    "Customer Portal",
+    "Customer Portal (Wholesaler / Retailer)",
+    "Retailer",
+    "Wholesaler",
+)
+
+
 class Role(models.Model):
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True, null=True)
@@ -48,11 +60,5 @@ class User(AbstractUser):
         return self.has_role("Sales Agent")
 
     @property
-    def is_customer(self) -> bool:
-        return self.roles.filter(name__in=[
-            "Customer",
-            "Customer Portal",
-            "Customer Portal (Wholesaler / Retailer)",
-            "Retailer",
-            "Wholesaler",
-        ]).exists()
+    def has_retired_customer_role(self) -> bool:
+        return self.roles.filter(name__in=RETIRED_CUSTOMER_ROLES).exists()

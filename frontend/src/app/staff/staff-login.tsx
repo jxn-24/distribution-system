@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+export default function StaffLogin() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -54,7 +54,7 @@ export default function LoginPage() {
           LUNASOFT ESSENTIALS LTD.
         </h1>
         <p className="text-center text-gray-800 mb-6">
-          Sign in to your account
+          Staff sign in
         </p>
 
         {error && (

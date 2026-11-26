@@ -31,10 +31,10 @@ class ProductSerializer(serializers.ModelSerializer):
     def get_fields(self):
         fields = super().get_fields()
         request = self.context.get("request")
-        if request and (request.user.is_customer or request.user.is_sales or request.user.is_sales_agent):
+        if request and (request.user.is_sales or request.user.is_sales_agent):
             for field_name in ("quantity_on_hand", "quantity_reserved", "warehouse", "location", "batch", "updated_at"):
                 fields.pop(field_name, None)
-        if request and (request.user.is_warehouse or request.user.is_customer):
+        if request and request.user.is_warehouse:
             fields.pop("selling_price", None)
             fields.pop("cost_price", None)
         if request and not (request.user.is_admin_user or request.user.is_director or request.user.is_finance):

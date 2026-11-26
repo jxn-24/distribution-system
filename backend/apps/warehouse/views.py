@@ -27,8 +27,6 @@ class ShipmentViewSet(viewsets.ModelViewSet):
             "Account Manager",
             "Sales Agent",
             "Finance",
-            "Customer",
-            "Customer Portal (Wholesaler / Retailer)",
         },
         "write": {"Admin", "Warehouse"},
     }
@@ -38,8 +36,6 @@ class ShipmentViewSet(viewsets.ModelViewSet):
         user = self.request.user
         if user.is_super_admin or user.is_admin_user or user.is_director or user.is_warehouse:
             return queryset
-        if user.is_customer:
-            return queryset.filter(sales_order__customer__user=user)
         if user.is_sales_agent:
             return queryset.filter(sales_order__sales_agent=user)
         if user.is_sales:

@@ -4,7 +4,6 @@ from django.db.models import Q, Sum, F, DecimalField
 from django.db.models.functions import Coalesce
 from rest_framework import viewsets
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
@@ -30,8 +29,6 @@ class CustomerViewSet(viewsets.ModelViewSet):
             return Customer.objects.filter(account_manager=user)
         if user.is_sales_agent:
             return Customer.objects.filter(sales_orders__sales_agent=user).distinct()
-        if user.is_customer:
-            return Customer.objects.filter(user=user)
         return Customer.objects.none()
 
     def perform_create(self, serializer):
@@ -56,21 +53,9 @@ class SalesOrderViewSet(viewsets.ModelViewSet):
             "Account Manager",
             "Finance",
             "Sales Agent",
-            "Customer",
-            "Customer Portal",
-            "Customer Portal (Wholesaler / Retailer)",
-            "Retailer",
-            "Wholesaler",
         },
         "write": {"Admin", "Sales", "Sales / Account Managers", "Account Manager"},
-        "create": {
-            "Sales Agent",
-            "Customer",
-            "Customer Portal",
-            "Customer Portal (Wholesaler / Retailer)",
-            "Retailer",
-            "Wholesaler",
-        },
+        "create": {"Sales Agent"},
     }
 
     def get_queryset(self):
@@ -95,18 +80,11 @@ class SalesOrderViewSet(viewsets.ModelViewSet):
             ).distinct()
         if user.is_sales_agent:
             return qs.filter(sales_agent=user)
-        if user.is_customer:
-            return qs.filter(customer__user=user)
         return qs.none()
 
     def perform_create(self, serializer):
         user = self.request.user
-        if user.is_customer:
-            customer = Customer.objects.filter(user=user).first()
-            if customer is None:
-                raise PermissionDenied("Your account is not linked to a customer profile.")
-            serializer.save(customer=customer, created_by=user)
-        elif user.is_sales_agent:
+        if user.is_sales_agent:
             serializer.save(sales_agent=user, created_by=user)
         else:
             serializer.save(created_by=user)

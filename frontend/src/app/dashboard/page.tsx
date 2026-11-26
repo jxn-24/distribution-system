@@ -25,9 +25,7 @@ const quickActionRoutes: Record<string, string> = {
   "Shipments": "/shipments",
   "View Shipments": "/shipments",
   "Products": "/products",
-  "Browse Products": "/products",
   "Order History": "/sales-orders",
-  "My Orders": "/sales-orders",
 };
 
 /* ---------- Data from the API ---------- */
@@ -95,9 +93,9 @@ interface Data {
 
 /* ---------- What each role sees ---------- */
 
-type Role = "full" | "director" | "finance" | "warehouse" | "sales" | "customer" | "none";
-type TileId = "awaitingPayment" | "readyToPack" | "drafts" | "shipPending" | "inTransit" | "lowStock" | "unpaid" | "overdue" | "myOpen";
-type AttentionId = "overdue" | "awaitingPayment" | "readyToPack" | "drafts" | "shipPending" | "lowStock" | "myOpen";
+type Role = "full" | "director" | "finance" | "warehouse" | "sales" | "none";
+type TileId = "awaitingPayment" | "readyToPack" | "drafts" | "shipPending" | "inTransit" | "lowStock" | "unpaid" | "overdue";
+type AttentionId = "overdue" | "awaitingPayment" | "readyToPack" | "drafts" | "shipPending" | "lowStock";
 
 function resolveRole(names: string[]): Role {
   const has = (...n: string[]) => n.some((x) => names.includes(x));
@@ -106,7 +104,6 @@ function resolveRole(names: string[]): Role {
   if (has("Finance")) return "finance";
   if (has("Warehouse")) return "warehouse";
   if (has("Sales", "Sales / Account Managers", "Account Manager", "Sales Agent")) return "sales";
-  if (has("Customer", "Customer Portal", "Customer Portal (Wholesaler / Retailer)", "Retailer", "Wholesaler")) return "customer";
   return "none";
 }
 
@@ -146,13 +143,6 @@ const roleView: Record<Role, { label: string; tiles: TileId[]; attention: Attent
     health: false,
     quickLinks: ["View Sales Orders", "Products"],
   },
-  customer: {
-    label: "Customer portal",
-    tiles: ["myOpen", "inTransit"],
-    attention: ["myOpen"],
-    health: false,
-    quickLinks: ["My Orders", "Browse Products"],
-  },
   none: { label: "", tiles: [], attention: [], health: false, quickLinks: [] },
 };
 
@@ -160,7 +150,6 @@ const tileSources: Record<TileId, Source[]> = {
   awaitingPayment: ["orders"],
   readyToPack: ["orders"],
   drafts: ["orders"],
-  myOpen: ["orders"],
   shipPending: ["shipments"],
   inTransit: ["shipments"],
   lowStock: ["inventory", "products"],
@@ -172,7 +161,6 @@ const attentionSources: Record<AttentionId, Source[]> = {
   awaitingPayment: ["orders"],
   readyToPack: ["orders"],
   drafts: ["orders"],
-  myOpen: ["orders"],
   shipPending: ["shipments"],
   lowStock: ["inventory", "products"],
 };
@@ -194,7 +182,6 @@ const kes = (v: number) => `KES ${money.format(Math.round(v))}`;
 
 const isoDay = (d: Date) => d.toISOString().slice(0, 10);
 const unpaidStatuses = ["ISSUED", "PARTIALLY_PAID"];
-const closedOrder = ["DELIVERED", "CANCELLED"];
 
 function derive(data: Data, today: Date) {
   const orders = data.orders ?? [];
@@ -229,7 +216,6 @@ function derive(data: Data, today: Date) {
     awaitingPayment: byStatus("CONFIRMED"),
     readyToPack: byStatus("READY_TO_PACK"),
     drafts: byStatus("DRAFT"),
-    myOpen: orders.filter((o) => !closedOrder.includes(o.status)),
     shipPending: shipments.filter((s) => s.status === "PENDING"),
     inTransit: shipments.filter((s) => s.status === "IN_TRANSIT"),
     unpaid: invoices,
@@ -405,7 +391,6 @@ function Dashboard() {
     },
     readyToPack: { label: "Ready to pack", value: d.readyToPack.length, href: role === "warehouse" || role === "full" ? "/ready-to-pack" : "/sales-orders" },
     drafts: { label: "Draft orders", value: d.drafts.length, href: "/sales-orders" },
-    myOpen: { label: "Orders in progress", value: d.myOpen.length, href: "/sales-orders" },
     shipPending: { label: "Shipments to send", value: d.shipPending.length, href: "/shipments" },
     inTransit: { label: "In transit", value: d.inTransit.length, href: "/shipments" },
     lowStock: { label: "Low stock", value: d.lowStock.length, detail: `${d.lowStock.length === 1 ? "product" : "products"} under minimum`, href: "/inventory" },
@@ -433,20 +418,19 @@ function Dashboard() {
         attention.push({ key: `inv-${i.id}`, title: i.invoice_number, subtitle: i.customer_name ?? "Invoice", badge: `${days} ${days === 1 ? "day" : "days"} overdue`, tone: "error", amount: kes(d.balance(i)), href: "/invoices", group: "overdue" });
       });
     }
-    if (kind === "awaitingPayment" || kind === "readyToPack" || kind === "drafts" || kind === "myOpen") {
+    if (kind === "awaitingPayment" || kind === "readyToPack" || kind === "drafts") {
       const list = d[kind];
       const meta = {
         awaitingPayment: { badge: "Awaiting payment", tone: "info" as const },
         readyToPack: { badge: "Ready to pack", tone: "wait" as const },
         drafts: { badge: "Draft", tone: "info" as const },
-        myOpen: { badge: "In progress", tone: "info" as const },
       }[kind];
       list.forEach((o) =>
         attention.push({
           key: `so-${kind}-${o.id}`,
           title: o.order_number,
           subtitle: o.customer_name ?? "Sales order",
-          badge: kind === "myOpen" ? o.status.replaceAll("_", " ").toLowerCase().replace(/^\w/, (c) => c.toUpperCase()) : meta.badge,
+          badge: meta.badge,
           tone: meta.tone,
           amount: kes(num(o.total_amount)),
           href: kind === "readyToPack" && (role === "warehouse" || role === "full") ? "/ready-to-pack" : `/sales-orders/${o.id}`,
@@ -472,7 +456,6 @@ function Dashboard() {
     awaitingPayment: { one: "order awaiting payment", many: "orders awaiting payment", href: paymentHref },
     readyToPack: { one: "order ready to pack", many: "orders ready to pack", href: readyHref },
     drafts: { one: "draft order", many: "draft orders", href: "/sales-orders" },
-    myOpen: { one: "order in progress", many: "orders in progress", href: "/sales-orders" },
     shipPending: { one: "shipment to send", many: "shipments to send", href: "/shipments" },
     lowStock: { one: "low-stock product", many: "low-stock products", href: "/inventory" },
   };

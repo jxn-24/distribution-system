@@ -36,10 +36,6 @@ class IsSalesAgent(BasePermission):
             request.user.is_sales_agent or request.user.is_admin_user
         )
 
-class IsCustomerUser(BasePermission):
-    def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.is_customer
-
 class ReadOnly(BasePermission):
     def has_permission(self, request, view):
         return request.method in SAFE_METHODS

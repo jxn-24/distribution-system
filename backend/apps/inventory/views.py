@@ -25,9 +25,8 @@ WAREHOUSE = {"Warehouse"}
 SALES = {"Sales", "Sales / Account Managers", "Account Manager"}
 FINANCE = {"Finance"}
 AGENTS = {"Sales Agent"}
-CUSTOMERS = {"Customer", "Customer Portal", "Customer Portal (Wholesaler / Retailer)", "Retailer", "Wholesaler"}
 EMPLOYEES = ADMIN | DIRECTORS | WAREHOUSE | SALES | AGENTS
-CATALOG_READERS = ADMIN | DIRECTORS | WAREHOUSE | SALES | AGENTS | CUSTOMERS
+CATALOG_READERS = ADMIN | DIRECTORS | WAREHOUSE | SALES | AGENTS
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -41,7 +40,7 @@ class BatchViewSet(viewsets.ModelViewSet):
     queryset = Batch.objects.all().select_related("product")
     serializer_class = BatchSerializer
     permission_classes = [RoleAccessPermission]
-    role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE | SALES | AGENTS | CUSTOMERS, "write": ADMIN | WAREHOUSE}
+    role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE | SALES | AGENTS, "write": ADMIN | WAREHOUSE}
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -68,13 +67,7 @@ class StockLocationViewSet(viewsets.ModelViewSet):
     queryset = StockLocation.objects.all().select_related("warehouse")
     serializer_class = StockLocationSerializer
     permission_classes = [RoleAccessPermission]
-    role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE | CUSTOMERS, "write": ADMIN | WAREHOUSE}
-
-    def get_queryset(self):
-        queryset = StockLocation.objects.select_related("warehouse")
-        if self.request.user.is_customer:
-            return queryset.filter(is_active=True, warehouse__is_active=True)
-        return queryset
+    role_access = {"read": ADMIN | DIRECTORS | WAREHOUSE, "write": ADMIN | WAREHOUSE}
 
 
 class InventoryViewSet(viewsets.ModelViewSet):

@@ -20,11 +20,6 @@ class InvoiceViewSet(viewsets.ModelViewSet):
             "Admin",
             "Director",
             "Finance",
-            "Customer",
-            "Customer Portal",
-            "Customer Portal (Wholesaler / Retailer)",
-            "Retailer",
-            "Wholesaler",
         },
         "write": {"Admin", "Finance"},
     }
@@ -34,8 +29,6 @@ class InvoiceViewSet(viewsets.ModelViewSet):
         queryset = Invoice.objects.select_related("sales_order", "customer", "created_by")
         if user.is_super_admin or user.is_admin_user or user.is_director or user.is_finance:
             return queryset
-        if user.is_customer:
-            return queryset.filter(customer__user=user)
         return queryset.none()
 
     def perform_create(self, serializer):
@@ -142,11 +135,6 @@ class ReceiptViewSet(viewsets.ModelViewSet):
             "Admin",
             "Director",
             "Finance",
-            "Customer",
-            "Customer Portal",
-            "Customer Portal (Wholesaler / Retailer)",
-            "Retailer",
-            "Wholesaler",
         },
         "write": {"Admin", "Finance"},
     }
@@ -156,8 +144,6 @@ class ReceiptViewSet(viewsets.ModelViewSet):
         queryset = Receipt.objects.select_related("invoice", "customer", "received_by")
         if user.is_super_admin or user.is_admin_user or user.is_director or user.is_finance:
             return queryset
-        if user.is_customer:
-            return queryset.filter(customer__user=user)
         return queryset.none()
 
     def perform_create(self, serializer):

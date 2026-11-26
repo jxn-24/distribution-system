@@ -17,6 +17,7 @@ colors:
   ink-muted: "oklch(55.6% 0 0)"
   night-line: "oklch(26.9% 0 0)"
   night-text: "oklch(87% 0 0)"
+  night-muted: "oklch(70.8% 0 0)"
   page-accent-blue: "oklch(37.9% 0.146 265.522)"
   status-info-bg: "oklch(93.2% 0.032 255.585)"
   status-info-text: "oklch(48.8% 0.243 264.376)"
@@ -63,6 +64,12 @@ typography:
     fontSize: "0.875rem"
     fontWeight: 600
     letterSpacing: "0.025em"
+  figure:
+    fontFamily: "Outfit, system-ui, sans-serif"
+    fontSize: "2rem"
+    fontWeight: 600
+    lineHeight: 1
+    fontFeature: "\"tnum\""
 rounded:
   xs: "0.25rem"
   sm: "0.375rem"
@@ -133,6 +140,35 @@ components:
     backgroundColor: "{colors.paper-tint}"
     textColor: "{colors.ink}"
     padding: "12px 16px"
+  glass-tile:
+    backgroundColor: "rgba(255, 255, 255, 0.07)"
+    textColor: "{colors.gold-bright}"
+    typography: "{typography.figure}"
+    rounded: "{rounded.lg}"
+    padding: "16px"
+    height: "112px"
+  glass-tile-fallback:
+    backgroundColor: "{colors.night-line}"
+  glass-tile-idle:
+    textColor: "{colors.night-muted}"
+  quick-action:
+    textColor: "{colors.gold-bright}"
+    typography: "{typography.body}"
+    rounded: "{rounded.sm}"
+    padding: "0 16px"
+    height: "44px"
+  attention-row:
+    backgroundColor: "{colors.paper}"
+    textColor: "{colors.ink}"
+    padding: "12px 16px"
+    height: "56px"
+  attention-row-hover:
+    backgroundColor: "{colors.paper-tint}"
+  attention-more:
+    backgroundColor: "{colors.paper-tint}"
+    typography: "{typography.body}"
+    padding: "0 16px"
+    height: "44px"
 ---
 
 # Design System: Luna Soft Essentials
@@ -145,7 +181,7 @@ This is a quiet, trustworthy instrument for counting stock, packing orders and g
 
 Density is set for phones first. Fields are 44–56px tall, tables use compact 14px text with 12px/16px cell padding, and every working screen is a stack of white cards on a light-grey canvas. The homepage takes the same palette and turns it toward warmth, with display-size Outfit headlines, a glowing product shot and dark bands alternating with white ones.
 
-The staff dashboards will move to a **glassy** treatment: translucent panels over a dark backdrop with a gold glow, so summary figures float above the night. This is a confirmed direction that hasn't been built yet (see Elevation & Depth). Each staff page will also get its **own accent colour** for identity, while the crescent logo, sidebar and wordmark stay the same everywhere (see Colors).
+The staff dashboard is **glassy**. It opens on a Luna Black night band with one soft gold glow, and the summary figures sit on translucent glass tiles above it, so the gold counts float over the night. Each tile opens the records behind its count. Below the band, the "Needs attention" list goes back to solid Paper, because those are records (see Elevation & Depth and Components). Each staff page will also get its **own accent colour** for identity, while the crescent logo, sidebar and wordmark stay the same everywhere (see Colors).
 
 **Key Characteristics:**
 - Near-black night surfaces (sidebar, homepage, scan) frame white working surfaces.
@@ -153,7 +189,8 @@ The staff dashboards will move to a **glassy** treatment: translucent panels ove
 - Outfit for brand and display moments, Figtree for everything you read or type.
 - Large phone-sized touch targets (44 / 48 / 56px).
 - Flat white cards with one soft shadow, gold glow only for light and live feedback.
-- Planned: glass panels on staff dashboards and a colour for each page under a fixed logo.
+- Glass figure tiles on the dashboard's night band, with a solid fallback for low-end phones.
+- Planned: a colour for each page under a fixed logo.
 
 ## Colors
 
@@ -177,7 +214,8 @@ The source also defines `--luna-gold: #f5c518` and `--luna-gold-soft: #e8b923` i
 - **Ink** (ink): Page titles, figures and table text that must be read correctly.
 - **Ink Body** (ink-body): Running text on Paper.
 - **Ink Muted** (ink-muted): Hints, captions and secondary columns.
-- **Night Line / Night Text** (night-line / night-text): Dividers and nav text on Luna Black.
+- **Night Line / Night Text** (night-line / night-text): Dividers and nav text on Luna Black. Night Line is also the solid fill of a glass tile when blur is unavailable.
+- **Night Muted** (night-muted): Quiet text on Luna Black, such as the dashboard date line, health-row labels and a figure that reads zero.
 
 ### Status tints
 These are paired backgrounds and text colours for order, shipment and payment states, shown as small badges and banner messages: **Info** (blue: confirmed or in progress), **OK** (green: paid, delivered, success), **Wait** (amber: pending or awaiting action) and **Error** (red: cancelled, failed, validation).
@@ -216,7 +254,8 @@ Each staff page has its own accent colour, which gives it identity and helps peo
 
 ### Hierarchy
 - **Display** (Outfit 600, 3rem, 1.25): Homepage hero headline only, with a Crescent Gold second line.
-- **Headline** (Figtree 700, 1.5rem, 1.33): The page title (h1) on every staff page, in Ink or the page accent. Dashboard figures also use this size in bold.
+- **Headline** (Figtree 700, 1.5rem, 1.33): The page title (h1) on every staff page, in Ink or the page accent.
+- **Figure** (Outfit 600, 2rem, 1, tabular numbers): The count on a dashboard glass tile, in Crescent Gold. It's the one place Outfit carries a number.
 - **Title** (Figtree 600, 1.125rem): Card and section headings.
 - **Body** (Figtree 400, 0.875rem, 1.43): The app's default size for tables, nav, buttons and help text. Use 500–600 for column headers and emphasis.
 - **Body Field** (Figtree 400, 1rem): Text typed into inputs and selects. It never goes below 16px, so iOS doesn't zoom into the field.
@@ -235,19 +274,25 @@ Touch targets follow three tiers: 44px for standard fields and buttons, 48px for
 
 The shell changes at `lg` (1024px). Below it, phones and tablets get a 56px sticky Luna Black top bar (menu button and wordmark), and the navigation moves into a left drawer, min(18rem, 85vw) wide. Main padding is 16px below `sm` (640px) and 24px above.
 
+The dashboard's night band cancels that padding so it runs to the edges of the main area, then pads its own content by the same 16px / 24px. Its glass tiles sit in a two-column grid with 12px gaps on phones and four columns from `lg` (1024px).
+
 ## Elevation & Depth
 
-Today the system is mostly flat with one level of lift. Cards use one soft, low shadow on Canvas. There are no layered shadows and nothing stacks deeper than a card. Light provides depth on night surfaces: a warm gold glow behind the homepage product shot and a bright glow on the live scan line.
+The system is mostly flat with one level of lift. Cards use one soft, low shadow on Canvas. There are no layered shadows and nothing stacks deeper than a card. Light provides depth on night surfaces: a warm gold glow behind the homepage product shot, a bright glow on the live scan line, and the gold glow under the dashboard's glass tiles.
 
 ### Shadow Vocabulary
 - **Card rest** (`box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)`): Every white card and table container. Removed when printing.
 - **Lamp glow** (`box-shadow: 0 0 40px rgba(251,191,36,0.28)`): Homepage hero product image.
 - **Scan beam** (`box-shadow: 0 0 12px rgba(251,191,36,0.9)`): The live gold line across the camera frame.
 
-### Glass dashboards (confirmed direction, not yet built)
-Staff dashboards will use translucent "glass" panels for summary figures and quick actions. Each panel sits on a Luna Black backdrop with a soft gold radial glow. Panels have a white fill at about 6–10% opacity, a background blur of 12px at most, a 1px border of white at about 12% opacity, and white text with Crescent Gold figures.
+### Glass dashboards
+The staff dashboard is built this way. A Luna Black night band holds the greeting, the glass figure tiles, the health row and the quick actions. Text selected on the band highlights in gold at 35% with white text.
 
-Low-end phones are a hard constraint, so the blur is an enhancement only. Without `backdrop-filter`, or under `prefers-reduced-transparency`, panels fall back to a solid near-black (night-line), and contrast must pass in that fallback.
+- **Glow:** one soft gold radial glow sits behind the tile grid, not behind the whole band, so every tile catches it. It's a radial gradient from gold at 30% to 10% at 60% of its radius, then fades out. It reaches 30% above and below the grid and 8% past each side. From `lg` (1024px), when four tiles sit in one row, it widens to 45% and 28% so the outer tiles stay in its light. It never catches the pointer.
+- **Glass:** each tile has a white fill at 7%, a 12px background blur, a 1px border of white at 12% and 12px corners. The tiles have no shadow. The glow behind them gives the depth.
+- **Fallback:** the solid fill comes first. Without `backdrop-filter` support, or under `prefers-reduced-transparency`, the tile is solid Night Line with the same border, and contrast passes there too. Blur is an enhancement for phones that can afford it.
+
+The quick actions and the health row sit straight on the band, not on glass.
 
 ### Named Rules
 **The Glass Is for Glancing Rule.** Glass goes only on dashboard summaries and quick actions. Tables, forms, receipts and anything printed or edited stay on solid Paper.
@@ -295,6 +340,32 @@ Large and calm, with gold as the call to action.
 
 ### Scan Frame (signature)
 The warehouse camera view is a 16:9 black frame with an 8px radius and a dark border, and a horizontal Lamp Gold beam with the Scan beam glow. Under it are a 56px night primary button and manual code entry as a fallback. It's the one screen that stays fully night, so it stays readable in a bright warehouse and shows that scanning is live.
+
+### Glass Figure Tile (signature)
+A count that opens the records behind it. The whole tile is one link and its accessible name gives the label, the figure and the detail line together.
+- **Shape:** 12px corners, 16px padding, at least 112px tall. Glass as described in Elevation & Depth.
+- **Figure:** the Figure style (Outfit 600, 2rem) in Crescent Gold with tabular numbers. It counts up once from zero in 650ms with an exponential ease-out, and shows the final value at once under reduced motion. A figure of zero turns Night Muted, so empty work reads as quiet, not as an alert.
+- **Open cue:** a 16px inline SVG chevron at the top right, in Night Text. It turns Crescent Gold on hover.
+- **Label and detail:** the label sits below the figure at 14px weight 500 in near-white. An optional 12px detail line in Night Text carries money due or a unit ("KES 48,200", "products under minimum").
+- **States:** on hover or press the border warms to Crescent Gold at 50%. Keyboard focus is a 2px Lamp Gold outline, 2px out.
+- **Loading:** the same tile with two white-at-10% bars that pulse only when motion is allowed.
+
+### Health Row
+A quieter line of money and delivery figures for Finance, Director and Admin, under the tiles. It's a definition list of up to three columns, separated from the tiles by a 1px white-at-10% rule with 16px above the content. Each column uses a shared two-row grid (subgrid), so labels align to the bottom of their row and every figure sits on the same baseline even when a label wraps. Labels are 12px Night Muted and name their period plainly ("Orders this month", "Margin, all orders to date"). Figures are 14px weight 600 tabular (16px from `sm`), with a 12px Night Muted line underneath. Columns are 12px apart on phones and 32px from `sm`.
+
+### Quick Actions
+A row of gold-outline links on the night band, each opening an existing page.
+- **Style:** 44px tall, 6px corners, 16px side padding, a 1px Lamp Gold border at 70%, and a 14px weight 600 Crescent Gold label that never wraps. On hover or press it gets a gold tint at 10%. Focus is the 2px Lamp Gold outline.
+- **Phones:** the row runs to the band's edges and scrolls sideways, with a thin scrollbar in gold at 40% on a transparent track. Overscroll stays inside the row.
+- **From `sm` (640px):** the row wraps onto more lines and doesn't scroll.
+- The "Try again" link for figures that failed to load uses the same shape with a full Lamp Gold border.
+
+### Needs Attention List
+The records behind the figures, back on solid Paper under the band.
+- **Container:** a 12px-corner Paper card with Card rest shadow, under an 18px weight 600 Ink section heading.
+- **Rows:** each row is one link, at least 56px tall with 12px/16px padding and a Hairline divider. The record number is 14px weight 600 Ink and the customer or product is 12px Ink Muted, both cut off with an ellipsis rather than wrapping. On the right, a status badge sits above a 12px tabular amount. A 16px Ink Muted chevron closes the row. Hover or press fills Paper Tint, and focus is a 2px gold outline inset into the row.
+- **Grouped footer:** the list shows at most eight rows. Anything past that is grouped by kind into "N more …" links ("3 more orders ready to pack") in a Paper Tint footer under a Hairline rule. They're 44px tall at 14px weight 500 in deep brass with a trailing chevron, and darken to a light grey on hover.
+- **Empty and loading:** "Nothing waiting on you right now." centred in 14px Ink Muted, or three pulsing grey bars while loading.
 
 ## Do's and Don'ts
 

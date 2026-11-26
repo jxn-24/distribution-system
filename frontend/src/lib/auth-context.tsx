@@ -83,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("refresh_token");
     setAccessToken(null);
     setUser(null);
-    router.push("/login");
+    router.push("/staff");
   };
 
   return (

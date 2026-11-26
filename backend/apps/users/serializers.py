@@ -28,6 +28,9 @@ class LoginSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid username or password.")
         if not user.is_active:
             raise serializers.ValidationError("User account is disabled.")
+        if user.has_retired_customer_role:
+            # Customer login accounts were retired with the customer portal.
+            raise serializers.ValidationError("Invalid username or password.")
 
         data["user"] = user
         return data

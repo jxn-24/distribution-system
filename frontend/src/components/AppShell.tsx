@@ -163,7 +163,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!isLoading && !user) {
-      router.push("/login");
+      router.replace("/staff");
     }
   }, [user, isLoading, router]);
 

@@ -20,4 +20,5 @@ frontend/out/
 # OS / editor
 .DS_Store
 .vscode/
-*.swp
+*.swp.claude/
+.claude/

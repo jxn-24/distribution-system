@@ -11,6 +11,8 @@ urlpatterns = [
     path("api/finance/", include("apps.finance.urls")),
     path('api/sales/', include('apps.sales.urls')),
     path('api/purchasing/', include('apps.purchasing.urls')),
-    path('api/warehouse/', include('apps.warehouse.urls'))
+    path('api/warehouse/', include('apps.warehouse.urls')),
+    # No login: the public website's feedback form and testimonials.
+    path('api/public/', include('apps.common.urls')),
 
 ]

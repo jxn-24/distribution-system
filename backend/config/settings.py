@@ -130,6 +130,8 @@ REST_FRAMEWORK = {
     # Login API: at most 5 attempts a minute from one IP address.
     "DEFAULT_THROTTLE_RATES": {
         "login": os.getenv("LOGIN_RATE_LIMIT", "5/min"),
+        # Public feedback form: at most 3 submissions an hour from one IP address.
+        "feedback": os.getenv("FEEDBACK_RATE_LIMIT", "3/hour"),
     },
     # Number of trusted reverse proxies in front of Django. 0 means the client IP is
     # REMOTE_ADDR. Set it (e.g. 1) when deployed behind a proxy so the throttle reads

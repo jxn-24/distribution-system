@@ -3,6 +3,10 @@
 
 export const site = {
   name: "Luna Soft Essentials",
+  // The public address of the website, used for search and sharing links.
+  // Set NEXT_PUBLIC_SITE_URL in production if the domain differs.
+  url: (process.env.NEXT_PUBLIC_SITE_URL ?? "https://lunasoftessentials.co.ke").replace(/\/$/, ""),
+  tagline: "Gentle care. Strong protection.",
   email: "info@lunasoftessentials.co.ke",
   emailSubject: "Enquiry from the website",
   phone: {

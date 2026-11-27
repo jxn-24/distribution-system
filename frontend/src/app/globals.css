@@ -106,3 +106,121 @@ body {
   scrollbar-width: thin;
   scrollbar-color: rgba(251, 191, 36, 0.4) transparent;
 }
+
+/* ---------- Public site ---------- */
+
+/* Text selection and anchor offsets across the public pages. */
+.site ::selection {
+  background: rgba(251, 191, 36, 0.4);
+  color: inherit;
+}
+
+.site [id] {
+  scroll-margin-top: 6rem;
+}
+
+/* Night band: Luna Black with one soft gold glow. --glow-x / --glow-y place it. */
+.site-night {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+.site-night::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  width: min(70rem, 160vw);
+  aspect-ratio: 1;
+  left: var(--glow-x, 70%);
+  top: var(--glow-y, 40%);
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(251, 191, 36, 0.2), rgba(251, 191, 36, 0.06) 55%, transparent);
+}
+
+/* Glass panels: only ever sit on a night band, so they catch the glow. Solid fill first. */
+.site-glass {
+  background: #1c1c1c;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Header: near-black everywhere, so it reads the same over dark and white sections. */
+.site-header {
+  background: #0a0a0a;
+}
+
+@supports ((-webkit-backdrop-filter: blur(12px)) or (backdrop-filter: blur(12px))) {
+  .site-glass {
+    background: rgba(255, 255, 255, 0.06);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .site-header {
+    background: rgba(10, 10, 10, 0.94);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-glass {
+    background: #1c1c1c;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .site-header {
+    background: #0a0a0a;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/* The gold disc behind the home hero product group: the full moon to the logo's crescent. */
+.gold-disc {
+  background: radial-gradient(circle at 35% 30%, #fde68a, #fbbf24 45%, #d97706 100%);
+  box-shadow: 0 30px 80px -20px rgba(251, 191, 36, 0.45), 0 0 0 1px rgba(253, 230, 138, 0.35) inset;
+}
+
+/* Phone menu drawer (a native modal <dialog>). */
+.site-drawer {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  max-height: none;
+  width: min(22rem, 88vw);
+  max-width: none;
+  padding: 0;
+  border: 0;
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+  background: #0a0a0a;
+  color: #ffffff;
+}
+
+.site-drawer::backdrop {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .site-drawer[open] {
+    animation: drawer-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+/* FAQ accordion: the plus turns into a minus when open. */
+.faq-sign {
+  transition: transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+[aria-expanded="true"] .faq-sign {
+  transform: rotate(45deg);
+}
